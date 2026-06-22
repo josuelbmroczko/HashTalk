@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1782146880486,
+    "username": "Ana Ferreira",
+    "content": "Este é o meu primeiro post no HashTalk!",
+    "timestamp": "2026-06-22T16:48:00.486Z"
+  },
+  {
+    "id": 1782147920311,
+    "username": "Carlos Souza",
+    "content": "Acabei de entrar na rede HashTalk! Meu primeiro post.",
+    "timestamp": "2026-06-22T17:05:20.311Z"
+  },
+  {
+    "id": 1782148831569,
+    "username": "Josuel",
+    "content": "Construindo minha própria API com Node.js e inteligência artificial!",
+    "hashtags": [
+      "#Nodejs",
+      "#InteligenciaArtificial",
+      "#Desenvolvimento"
+    ],
+    "timestamp": "2026-06-22T17:20:31.569Z"
+  }
+]
