@@ -29,9 +29,7 @@ function Perfil() {
       try {
         const token = localStorage.getItem('token');
         const response = await fetch("http://localhost:3000/api/posts/me", {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         if (response.ok) {

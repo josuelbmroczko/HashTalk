@@ -73,7 +73,6 @@ function Cadastro() {
             alt="Logo HashTalk"
             className="logo-cadastro"
           />
-
           <p>
             Rápido e fácil! Sua empresa pronta em minutos.
           </p>
@@ -93,7 +92,7 @@ function Cadastro() {
           <p className="subtitle">
             É rápido e fácil
           </p>
-
+          
           <form className="cadastro-form" onSubmit={handleSubmit}>
             <div>
               <label>Nome da empresa</label>
@@ -135,7 +134,7 @@ function Cadastro() {
                 />
               </div>
             </div>
-
+            
             <div>
               <label>E-mail corporativo</label>
               <input
@@ -148,7 +147,7 @@ function Cadastro() {
                 required
               />
             </div>
-
+            
             <div>
               <label>Senha</label>
               <input
@@ -181,7 +180,7 @@ function Cadastro() {
           )}
 
           <p className="login-text">
-            Ja tem uma conta? <button type="button" onClick={() => navigate("/login")}>Entrar</button>
+            Já tem uma conta? <button type="button" onClick={() => navigate("/login")}>Entrar</button>
           </p>
         </section>
       </section>
