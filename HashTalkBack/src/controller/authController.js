@@ -1,3 +1,8 @@
+const jwt = require('jsonwebtoken');
+const userService = require('../service/userService');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'hashTalk_secret_key_2026';
+
 class AuthController {
     async register(req, res) {
         try {
@@ -41,7 +46,7 @@ class AuthController {
                 return res.status(400).json({ error: 'Email institucional inválido' });
             }
 
-            const newUser = await usuService.createUser({
+            const newUser = await userService.createUser({
                 empresaId,
                 nomeEmpresa,
                 nomeFuncionario,
@@ -63,6 +68,41 @@ class AuthController {
             res.status(500).json({ error: 'Erro ao criar usuário' });
         }
     }
+
+    async login(req, res) {
+        try {
+            const { emailInstitucional, senha } = req.body;
+
+            if (!emailInstitucional || !senha) {
+                return res.status(400).json({
+                    error: 'Email institucional e senha sao obrigatorios'
+                });
+            }
+
+            const user = await userService.validateLogin(emailInstitucional, senha);
+            const token = jwt.sign(
+                {
+                    id: user.id,
+                    empresaId: user.empresaId,
+                    nomeEmpresa: user.nomeEmpresa,
+                    nomeFuncionario: user.nomeFuncionario,
+                    cargoFuncionario: user.cargoFuncionario,
+                    emailInstitucional: user.emailInstitucional
+                },
+                JWT_SECRET,
+                { expiresIn: '8h' }
+            );
+
+            res.json({
+                message: 'Login realizado com sucesso',
+                token,
+                usuario: user
+            });
+        } catch (error) {
+            res.status(401).json({ error: error.message });
+        }
+    }
+
     // Verificar token
     async verifyToken(req, res) {
         try {

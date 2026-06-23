@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "empresaId": 1001,
+    "nomeEmpresa": "Tech Solutions LTDA",
+    "nomeFuncionario": "Matheus Silva",
+    "cargoFuncionario": "Administrador",
+    "emailInstitucional": "matheus@techsolutions.com.br",
+    "senha": "$2b$10$lT6pXv2atmeXfxFro2.4wOfU9LDv9GT5BhOM.8m2Euf/92RnYusRa",
+    "dataCriacao": "2026-06-23T16:15:23.924Z"
+  },
+  {
+    "id": 2,
+    "empresaId": 1002,
+    "nomeEmpresa": "Inovação Digital SA",
+    "nomeFuncionario": "Carla Oliveira",
+    "cargoFuncionario": "Gerente de Projetos",
+    "emailInstitucional": "carla@inovacaodigital.com.br",
+    "senha": "$2b$10$0Sm3XxU7lyO85R9k3KrWiO/uZynn.rOjLxiz8UdLLVByE5kxOHO3e",
+    "dataCriacao": "2026-06-23T16:15:55.724Z"
+  }
+]

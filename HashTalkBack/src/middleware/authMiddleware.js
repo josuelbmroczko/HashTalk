@@ -24,7 +24,7 @@ const authMiddleware = {
         }
     },
 
-    varifyUsersExists: async (res, req, next) => {
+    verifyUserExists: async (req, res, next) => {
         try {
             const user = await userService.findUserById(req.user.id);
             if (!user) {
@@ -41,12 +41,13 @@ const authMiddleware = {
     },
 
     // Extraindo infor do usuarios para usar em rotas.
-    extractUsersInfo: (req, res, next) => {
+    extractUserInfo: (req, res, next) => {
         if (req.user) {
             req.userInfo = {
                 id: req.user.id,
                 empresaId: req.user.empresaId,
                 nomeEmpresa: req.user.nomeEmpresa,
+                nomeFuncionario: req.user.nomeFuncionario,
                 cargoFuncionario: req.user.cargoFuncionario,
                 emailInstitucional: req.user.emailInstitucional
             };
