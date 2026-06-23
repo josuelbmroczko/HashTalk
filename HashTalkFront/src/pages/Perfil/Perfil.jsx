@@ -34,11 +34,9 @@ function Perfil() {
         const data = await response.json();
         if (response.ok) {
           setPosts(data.posts || []);
-        } else {
-          console.error("Erro ao buscar meus posts:", data.error);
         }
       } catch (error) {
-        console.error("Erro na requisição:", error);
+        console.error("Erro ao buscar meus posts:", error);
       } finally {
         setLoading(false);
       }
@@ -51,41 +49,31 @@ function Perfil() {
     <div className="app-container">
       <MenuLateral />
       <div className="content-wrapper">
-        <main className="perfil-page" style={{ width: '100%', margin: '0' }}>
-          <section className="perfil-card" style={{ display: 'block', maxWidth: '800px', margin: '0 auto' }}>
-            <section className="perfil-conteudo" style={{ borderLeft: 'none' }}>
+        <main className="perfil-page">
+          <section className="perfil-card">
+            <section className="perfil-conteudo">
               <div className="perfil-capa"></div>
 
               <div className="perfil-info">
-                <div className="avatar">{userInfo?.nomeEmpresa?.substring(0, 2) || userInfo?.nomeFuncionario?.substring(0, 2) || 'US'}</div>
+                <div className="avatar">
+                  {userInfo?.nomeEmpresa?.substring(0, 2) || userInfo?.nomeFuncionario?.substring(0, 2) || 'US'}
+                </div>
 
                 <button className="editar-perfil">Editar perfil</button>
 
                 <h1>{userInfo?.nomeEmpresa || userInfo?.nomeFuncionario || "Usuário"}</h1>
-                <p className="user">@{userInfo?.nomeEmpresa?.toLowerCase().replace(/\s/g, '') || userInfo?.nomeFuncionario?.toLowerCase().replace(/\s/g, '') || 'usuario'} · {userInfo?.cargoFuncionario || 'Cargo'}</p>
-
-                <div className="local">
-                  Brasil · hashtalk.app/perfil
-                </div>
-
-                <p className="bio">
-                  Apaixonada por tecnologia, design e inovação.
+                <p className="user">
+                  @{userInfo?.nomeEmpresa?.toLowerCase().replace(/\s/g, '') || userInfo?.nomeFuncionario?.toLowerCase().replace(/\s/g, '') || 'usuario'} 
+                  · {userInfo?.cargoFuncionario || 'Cargo'}
                 </p>
+
+                <p className="bio">Apaixonada por tecnologia, design e inovação.</p>
               </div>
 
               <div className="perfil-numeros">
-                <div>
-                  <strong>{posts.length}</strong>
-                  <span>Posts</span>
-                </div>
-                <div>
-                  <strong>842</strong>
-                  <span>Seguidores</span>
-                </div>
-                <div>
-                  <strong>356</strong>
-                  <span>Seguindo</span>
-                </div>
+                <div><strong>{posts.length}</strong> <span>Posts</span></div>
+                <div><strong>842</strong> <span>Seguidores</span></div>
+                <div><strong>356</strong> <span>Seguindo</span></div>
               </div>
 
               <div className="perfil-tabs">
@@ -100,19 +88,8 @@ function Perfil() {
                 posts.map(post => (
                   <article className="post-card" key={post.id}>
                     <p>{post.content}</p>
-
-                    {post.hashtags && post.hashtags.length > 0 && (
-                      <div className="hashtags">
-                        {post.hashtags.map((tag, idx) => (
-                          <span key={idx} style={{ marginRight: '5px', color: '#007bff' }}>{tag}</span>
-                        ))}
-                      </div>
-                    )}
-
                     <div className="post-acoes">
-                      <span>♡ 0</span>
-                      <span>💬 0</span>
-                      <span>↗ 0</span>
+                      <span>♡ 0</span> <span>💬 0</span>
                       <small>{new Date(post.created_at).toLocaleDateString()}</small>
                     </div>
                   </article>
