@@ -19,7 +19,6 @@
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
-
 .cadastro-side {
   width: 300px;
   background: #F0F9FB;
@@ -45,7 +44,6 @@
   max-width: 180px;
   line-height: 1.5;
 }
-
 
 .cadastro-content {
   flex: 1;
@@ -82,7 +80,6 @@
   text-align: left;
   font-size: 14px;
 }
-
 
 .cadastro-form {
   display: flex;
@@ -170,7 +167,6 @@
   text-decoration: underline;
 }
 
-
 @media (max-width: 768px) {
   .cadastro-card {
     flex-direction: column;
@@ -196,7 +192,6 @@
   .form-row {
     grid-template-columns: 1fr;
   }
-
 
   .mensagem-erro, .mensagem-sucesso {
     width: 100%;
