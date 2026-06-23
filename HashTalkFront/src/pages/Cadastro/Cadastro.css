@@ -196,4 +196,13 @@
   .form-row {
     grid-template-columns: 1fr;
   }
+
+  .mensagem-cadastro {
+  width: 100%;
+  margin-top: 16px;
+  text-align: center;
+  color: #0891B2;
+  font-size: 14px;
+  font-weight: 600;
+}
 }
