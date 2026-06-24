@@ -2,7 +2,7 @@
 import { FaHome, FaBell, FaEnvelope, FaUser, FaCog } from 'react-icons/fa';
 import { IoIosBusiness } from 'react-icons/io';
 import { MdExplore } from 'react-icons/md';
-import logo from '../imagens/logo.jpeg'
+import logo from '../assets/logo.jpeg'
 
 export default function MenuLateral() {
     return (
