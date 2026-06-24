@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react'
 
@@ -26,9 +27,9 @@ function App() {
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
     </Routes>
-
    
   )
+
 }
 
 export default App;
