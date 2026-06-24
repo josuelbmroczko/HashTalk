@@ -1,21 +1,35 @@
-import Cadastro from "./pages/Cadastro/Cadastro";
-import Perfil from "./pages/Perfil/Perfil";
+
+import { Routes, Route } from 'react-router-dom';
+import { useState } from 'react'
+
+import './App.css'
+import Home from './paginas/home'
+import Postagem from './paginas/postagem';
+import Explorar from './paginas/explorar';
+import Notificacoes from './paginas/notificacoes';
+import MinhaEmpresa from './paginas/minhaempresa';
+import Mensagens from './paginas/mensagens';
+import Perfil from './paginas/perfil';
+import Configuracoes from './paginas/configuracoes';
+
 
 function App() {
+  
   return (
-    <>
-      <Cadastro />
+    //reinderizando por rotas, cada tela é uma rota no sistema
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/postagem" element={<Postagem />} />
+      <Route path="/explorar" element={<Explorar />} />
+      <Route path="/notificacoes" element={<Notificacoes />} />
+      <Route path="/minhaempresa" element={<MinhaEmpresa />} />
+      <Route path="/mensagens" element={<Mensagens />} />
+      <Route path="/perfil" element={<Perfil />} />
+      <Route path="/configuracoes" element={<Configuracoes />} />
+    </Routes>
+   
+  )
 
-      <hr
-        style={{
-          margin: "80px 0",
-          border: "1px solid #E2E8F0"
-        }}
-      />
-
-      <Perfil />
-    </>
-  );
 }
 
 export default App;
