@@ -1,13 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from './assets/vite.svg'
-// import heroImg from './assets/hero.png'
 import './App.css'
 import Home from './paginas/home'
 import Postagem from './paginas/postagem';
 import Explorar from './paginas/explorar';
 import Notificacoes from './paginas/notificacoes';
+import MinhaEmpresa from './paginas/minhaempresa';
 import Mensagens from './paginas/mensagens';
 import Perfil from './paginas/perfil';
 import Configuracoes from './paginas/configuracoes';
@@ -21,6 +19,7 @@ function App() {
       <Route path="/postagem" element={<Postagem />} />
       <Route path="/explorar" element={<Explorar />} />
       <Route path="/notificacoes" element={<Notificacoes />} />
+      <Route path="/minhaempresa" element={<MinhaEmpresa />} />
       <Route path="/mensagens" element={<Mensagens />} />
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/configuracoes" element={<Configuracoes />} />

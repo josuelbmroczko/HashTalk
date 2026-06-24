@@ -1,5 +1,6 @@
 //icones para o menu lateral
 import { FaHome, FaBell, FaEnvelope, FaUser, FaCog } from 'react-icons/fa';
+import { IoIosBusiness } from 'react-icons/io';
 import { MdExplore } from 'react-icons/md';
 import logo from '../imagens/logo.jpeg'
 
@@ -11,7 +12,7 @@ export default function MenuLateral() {
                 <img src={logo} alt="Logo" />
             </div>
 
-            <navbar className="">
+            <navbar>
                 <ul>
                     <li>
                         <a href='/'>
@@ -29,6 +30,12 @@ export default function MenuLateral() {
                         <a href='/notificacoes'>
                             <FaBell className="icone"/>
                             <span>Notificações</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href='/minhaempresa'>
+                            <IoIosBusiness className="icone"/>
+                            <span>Minha Empresa</span>
                         </a>
                     </li>
                     <li>

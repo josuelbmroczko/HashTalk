@@ -34,6 +34,20 @@ body {
   top: 0;
 }
 
+.secaoLateral {
+  width: 275px; 
+  min-width: 275px; 
+  height: 100vh;
+  padding: 20px;
+  border-right: 1px solid #e2e8f0; /* Primeira linha vertical */
+  background-color: #ffffff;
+  
+  display: flex;
+  flex-direction: column; 
+  position: sticky;
+  top: 2;
+}
+
 .img-logo {
   display: flex;
   height: 50px;
@@ -138,6 +152,188 @@ li a:hover {
   margin: 24px;
   padding: 12px;
 }
+
+.area-postagem {
+  border: solid black 0.5px;
+  border-radius: 12px;
+  margin: 40px;
+  padding: 12px;
+  height: 150px;
+  width: auto;
+}
+
+.area-postagem textarea{
+
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  margin: 5px;
+
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+ 
+.post-header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+ 
+.post-header-logo img {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+}
+ 
+.logo-nome {
+  font-weight: 700;
+  font-size: 16px;
+  color: #00a8b5;
+}
+ 
+.post-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+ 
+.link-postar {
+  color: #00a8b5;
+  font-weight: 600;
+  text-decoration: none;
+}
+ 
+.link-postar:hover {
+  text-decoration: underline;
+}
+
+.empresa-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+ 
+.empresa-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #00a8b5;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+ 
+.empresa-info strong {
+  display: block;
+  font-size: 15px;
+  color: #1E293B;
+}
+ 
+.empresa-handle {
+  font-size: 13px;
+  color: #64748b;
+}
+ 
+
+
+.area-postagem textarea::placeholder {
+  color: #94a3b8;
+}
+
+
+.secao-label {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+ 
+/* --- HASHTAGS --- */
+.hashtags-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+ 
+.hashtag-chip {
+  border: 1.5px dashed #00a8b5;
+  color: #00a8b5;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+ 
+/* --- VISIBILIDADE --- */
+.visibilidade-opcoes {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+ 
+.btn-visibilidade {
+  padding: 6px 16px;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  background-color: transparent;
+  font-size: 13px;
+  color: #64748b;
+  cursor: pointer;
+}
+ 
+.btn-visibilidade.ativo {
+  background-color: #00a8b5;
+  color: #ffffff;
+  border-color: #00a8b5;
+}
+ 
+/* --- BOTÕES DE AÇÃO --- */
+.acoes-post {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+ 
+.btn-hashtag {
+  padding: 10px 24px;
+  border-radius: 9999px;
+  border: 1.5px solid #cbd5e1;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #1E293B;
+  cursor: pointer;
+}
+ 
+.btn-hashtag:hover {
+  background-color: #f1f5f9;
+}
+ 
+.btn-publicar {
+  padding: 10px 28px;
+  border-radius: 9999px;
+  border: none;
+  background-color: #1E293B;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+ 
+.btn-publicar:hover {
+  background-color: #0f172a;
+}
+ 
 
 .feed {
   padding: 20px;
