@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react'
+
 import './App.css'
 import Home from './paginas/home'
 import Postagem from './paginas/postagem';
@@ -9,6 +10,7 @@ import MinhaEmpresa from './paginas/minhaempresa';
 import Mensagens from './paginas/mensagens';
 import Perfil from './paginas/perfil';
 import Configuracoes from './paginas/configuracoes';
+
 
 function App() {
   
@@ -24,6 +26,8 @@ function App() {
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
     </Routes>
+
+   
   )
 }
 
