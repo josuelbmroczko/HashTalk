@@ -18,5 +18,15 @@
     "emailInstitucional": "carla@inovacaodigital.com.br",
     "senha": "$2b$10$0Sm3XxU7lyO85R9k3KrWiO/uZynn.rOjLxiz8UdLLVByE5kxOHO3e",
     "dataCriacao": "2026-06-23T16:15:55.724Z"
+  },
+  {
+    "id": 3,
+    "empresaId": 1010,
+    "nomeEmpresa": "Tech Solutions LTDA",
+    "nomeFuncionario": "Matheus Silva",
+    "cargoFuncionario": "Administrador",
+    "emailInstitucional": "matheus@tech.com",
+    "senha": "$2b$10$EcQYCTze8rKX/yjUn2xPH.EoFpCIKZfFVLGnZqg.jEkbf8mVCBTIO",
+    "dataCriacao": "2026-06-24T18:07:08.646Z"
   }
 ]
