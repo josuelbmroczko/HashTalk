@@ -3,18 +3,6 @@ import { useState } from 'react';
 import logo from '../imagens/logo.jpeg'
 import SecaoLateral from '../componentes/secaoLateral';
 
-/*
-(lado esquerdo)
-logo em cima -> Novo post Postar (link string)
-nome da empresa
-area de texto para ser escrito
-numero de caracteres maximo*
-botão de gerar hashtag para ler o texto lido
-botão de publicar post
-
-na outra part da pagina (lado direito)
-
-*/
 
 export default function Postagem() {
     const [texto, setTexto] = useState('');
