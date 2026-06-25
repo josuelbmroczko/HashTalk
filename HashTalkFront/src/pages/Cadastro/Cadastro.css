@@ -197,12 +197,34 @@
     grid-template-columns: 1fr;
   }
 
-  .mensagem-cadastro {
+  .mensagem-erro, .mensagem-sucesso {
+    width: 100%;
+    margin-top: 16px;
+  }
+}
+
+.mensagem-erro {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #DC2626;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
   width: 100%;
   margin-top: 16px;
-  text-align: center;
-  color: #0891B2;
-  font-size: 14px;
-  font-weight: 600;
 }
+
+.mensagem-sucesso {
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #059669;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  margin-top: 16px;
 }

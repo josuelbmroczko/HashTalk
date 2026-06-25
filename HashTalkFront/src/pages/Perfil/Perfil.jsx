@@ -1,84 +1,132 @@
+import { useState, useEffect } from 'react';
+import MenuLateral from "../../componentes/menuLateral";
 import "./Perfil.css";
 
 function Perfil() {
+  const [userInfo, setUserInfo] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch("http://localhost:3000/api/auth/me", {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setUserInfo(data.usuario);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+      }
+    };
+    
+    fetchUserData();
+
+    const fetchMyPosts = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch("http://localhost:3000/api/posts/me", {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setPosts(data.posts || []);
+        } else {
+          console.error("Erro ao buscar meus posts:", data.error);
+        }
+      } catch (error) {
+        console.error("Erro na requisição:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyPosts();
+  }, []);
+
   return (
-    <main className="perfil-page">
-      <section className="perfil-card">
-        <aside className="perfil-sidebar">
-          <div className="perfil-logo">HashTalk</div>
+    <div className="app-container">
+      <MenuLateral />
+      <div className="content-wrapper">
+        <main className="perfil-page" style={{ width: '100%', margin: '0' }}>
+          <section className="perfil-card" style={{ display: 'block', maxWidth: '800px', margin: '0 auto' }}>
+            <section className="perfil-conteudo" style={{ borderLeft: 'none' }}>
+              <div className="perfil-capa"></div>
 
-          <nav>
-            <a>Página inicial</a>
-            <a>Explorar</a>
-            <a>Notificações</a>
-            <a>Mensagens</a>
-            <a>Minha empresa</a>
-            <a className="ativo">Perfil</a>
-            <a>Configurações</a>
-          </nav>
+              <div className="perfil-info">
+                <div className="avatar">{userInfo?.nomeEmpresa?.substring(0, 2) || userInfo?.nomeFuncionario?.substring(0, 2) || 'US'}</div>
 
-          <button className="novo-post">+ Novo post</button>
-        </aside>
+                <button className="editar-perfil">Editar perfil</button>
 
-        <section className="perfil-conteudo">
-          <div className="perfil-capa"></div>
+                <h1>{userInfo?.nomeEmpresa || userInfo?.nomeFuncionario || "Usuário"}</h1>
+                <p className="user">@{userInfo?.nomeEmpresa?.toLowerCase().replace(/\s/g, '') || userInfo?.nomeFuncionario?.toLowerCase().replace(/\s/g, '') || 'usuario'} · {userInfo?.cargoFuncionario || 'Cargo'}</p>
 
-          <div className="perfil-info">
-            <div className="avatar">AM</div>
+                <div className="local">
+                  Brasil · hashtalk.app/perfil
+                </div>
 
-            <button className="editar-perfil">Editar perfil</button>
+                <p className="bio">
+                  Apaixonada por tecnologia, design e inovação.
+                </p>
+              </div>
 
-            <h1>Ana Martins</h1>
-            <p className="user">@anamartins · CEO na Tech Solutions</p>
+              <div className="perfil-numeros">
+                <div>
+                  <strong>{posts.length}</strong>
+                  <span>Posts</span>
+                </div>
+                <div>
+                  <strong>842</strong>
+                  <span>Seguidores</span>
+                </div>
+                <div>
+                  <strong>356</strong>
+                  <span>Seguindo</span>
+                </div>
+              </div>
 
-            <div className="local">
-              Brasil · hashtalk.app/anamartins
-            </div>
+              <div className="perfil-tabs">
+                <button className="tab-ativa">Posts</button>
+                <button>Respostas</button>
+                <button>Curtidas</button>
+              </div>
 
-            <p className="bio">
-              Apaixonada por tecnologia, design e inovação. Liderando a Tech Solutions rumo ao futuro.
-            </p>
-          </div>
+              {loading ? (
+                <p style={{ padding: '20px' }}>Carregando posts...</p>
+              ) : posts.length > 0 ? (
+                posts.map(post => (
+                  <article className="post-card" key={post.id}>
+                    <p>{post.content}</p>
 
-          <div className="perfil-numeros">
-            <div>
-              <strong>128</strong>
-              <span>Posts</span>
-            </div>
-            <div>
-              <strong>842</strong>
-              <span>Seguidores</span>
-            </div>
-            <div>
-              <strong>356</strong>
-              <span>Seguindo</span>
-            </div>
-          </div>
+                    {post.hashtags && post.hashtags.length > 0 && (
+                      <div className="hashtags">
+                        {post.hashtags.map((tag, idx) => (
+                          <span key={idx} style={{ marginRight: '5px', color: '#007bff' }}>{tag}</span>
+                        ))}
+                      </div>
+                    )}
 
-          <div className="perfil-tabs">
-            <button className="tab-ativa">Posts</button>
-            <button>Respostas</button>
-            <button>Curtidas</button>
-          </div>
-
-          <article className="post-card">
-            <p>Trabalhando em algo novo. Em breve, compartilho mais!</p>
-
-            <div className="hashtags">
-              <span>#Inovação</span>
-              <span>#B2B</span>
-            </div>
-
-            <div className="post-acoes">
-              <span>♡ 23</span>
-              <span>💬 7</span>
-              <span>↗ 15</span>
-              <small>2h atrás</small>
-            </div>
-          </article>
-        </section>
-      </section>
-    </main>
+                    <div className="post-acoes">
+                      <span>♡ 0</span>
+                      <span>💬 0</span>
+                      <span>↗ 0</span>
+                      <small>{new Date(post.created_at).toLocaleDateString()}</small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p style={{ padding: '20px' }}>Nenhum post encontrado.</p>
+              )}
+            </section>
+          </section>
+        </main>
+      </div>
+    </div>
   );
 }
 
