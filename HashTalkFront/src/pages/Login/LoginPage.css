@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+﻿@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 * {
   margin: 0;
@@ -122,7 +122,7 @@ body {
   color: #64748B;
 }
 
-/* FORMULÁRIO */
+/* FORMULÃRIO */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -170,7 +170,7 @@ body {
   background: #F8FAFC;
 }
 
-/* Wrapper para senha com botão */
+/* Wrapper para senha com botÃ£o */
 .password-wrapper {
   position: relative;
   width: 100%;
@@ -216,7 +216,7 @@ body {
   text-align: center;
 }
 
-/* Opções do Formulário */
+/* OpÃ§Ãµes do FormulÃ¡rio */
 .form-options {
   display: flex;
   justify-content: flex-end;
@@ -247,7 +247,7 @@ body {
   cursor: not-allowed;
 }
 
-/* Botão de Login */
+/* BotÃ£o de Login */
 .btn-login-submit {
   width: 100%;
   background: #FFFFFF;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MenuLateral from "../../componentes/MenuLateral";
+import MenuLateral from "../../componentes/menuLateral";
 import "./Perfil.css";
 
 function Perfil() {
