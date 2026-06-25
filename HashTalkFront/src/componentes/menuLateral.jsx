@@ -1,130 +1,116 @@
-import { useState } from 'react';
-import { FaHome, FaBell, FaEnvelope, FaUser, FaCog, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
-import { IoIosBusiness } from 'react-icons/io';
-import { MdExplore } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.jpeg';
-import './menuLateral.css';
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaBell, FaCog, FaEnvelope, FaHome, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { FaBars, FaPlus, FaXmark } from "react-icons/fa6";
+import { IoIosBusiness } from "react-icons/io";
+import { MdExplore } from "react-icons/md";
+import logo from "../assets/logo.jpeg";
+import { API_URL } from "../config/api";
+import "./menuLateral.css";
+
+const navItems = [
+  { to: "/home", label: "Inicio", icon: FaHome },
+  { to: "/explorar", label: "Explorar", icon: MdExplore },
+  { to: "/notificacoes", label: "Notificacoes", icon: FaBell, disabled: true },
+  { to: "/minhaempresa", label: "Minha empresa", icon: IoIosBusiness },
+  { to: "/mensagens", label: "Mensagens", icon: FaEnvelope, disabled: true },
+  { to: "/perfil", label: "Perfil", icon: FaUser },
+  { to: "/configuracoes", label: "Configuracoes", icon: FaCog },
+];
 
 export default function MenuLateral() {
-    const navigate = useNavigate();
-    const [menuAberto, setMenuAberto] = useState(false);
+  const navigate = useNavigate();
+  const [menuAberto, setMenuAberto] = useState(false);
 
-    const fecharMenu = () => setMenuAberto(false);
+  const fecharMenu = () => setMenuAberto(false);
 
-    const handleLogout = async (event) => {
-        event.preventDefault();
-        fecharMenu();
+  const handleLogout = async (event) => {
+    event.preventDefault();
+    fecharMenu();
 
-        try {
-            const token = localStorage.getItem('token');
-            if (token) {
-                await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-            }
-        } catch (error) {
-            console.error('Erro no logout', error);
-        } finally {
-            localStorage.removeItem('token');
-            localStorage.removeItem('usuario');
-            navigate('/login');
-        }
-    };
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await fetch(`${API_URL}/api/auth/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch (error) {
+      console.error("Erro no logout", error);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("usuario");
+      navigate("/login");
+    }
+  };
 
-    return (
-        <>
-            <button
-                type="button"
-                className="hamburger-btn"
-                onClick={() => setMenuAberto(true)}
-                aria-label="Abrir menu"
-                aria-expanded={menuAberto}
-                aria-controls="menu-lateral"
-            >
-                <FaBars />
-            </button>
+  const handleDisabled = (event) => {
+    event.preventDefault();
+    fecharMenu();
+  };
 
-            <div
-                className={`menu-overlay ${menuAberto ? 'active' : ''}`}
-                onClick={fecharMenu}
-                aria-hidden="true"
-            />
+  return (
+    <>
+      <button
+        type="button"
+        className="hamburger-btn"
+        onClick={() => setMenuAberto(true)}
+        aria-label="Abrir menu"
+        aria-expanded={menuAberto}
+        aria-controls="menu-lateral"
+      >
+        <FaBars />
+      </button>
 
-            <aside id="menu-lateral" className={`lateralMenu ${menuAberto ? 'menu-open' : ''}`}>
-                <button
-                    type="button"
-                    className="close-menu-btn"
-                    onClick={fecharMenu}
-                    aria-label="Fechar menu"
+      <div className={`menu-overlay ${menuAberto ? "active" : ""}`} onClick={fecharMenu} aria-hidden="true" />
+
+      <aside id="menu-lateral" className={`lateralMenu ${menuAberto ? "menu-open" : ""}`}>
+        <button type="button" className="close-menu-btn" onClick={fecharMenu} aria-label="Fechar menu">
+          <FaXmark />
+        </button>
+
+        <div className="menu-brand">
+          <img src={logo} alt="HashTalk" />
+          <div>
+            <strong>HashTalk</strong>
+            <span>Rede B2B</span>
+          </div>
+        </div>
+
+        <nav aria-label="Navegacao principal">
+          <ul>
+            {navItems.map(({ to, label, icon: Icon, disabled }) => (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  onClick={disabled ? handleDisabled : fecharMenu}
+                  className={({ isActive }) =>
+                    `${isActive ? "active" : ""} ${disabled ? "disabled" : ""}`.trim()
+                  }
+                  aria-disabled={disabled ? "true" : undefined}
                 >
-                    <FaTimes />
-                </button>
+                  <Icon className="icone" />
+                  <span>{label}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-                <div className="img-logo">
-                    <img src={logo} alt="Logo" />
-                </div>
+        <div className="menu-footer">
+          <NavLink className="btn-post" to="/postagem" onClick={fecharMenu}>
+            <FaPlus />
+            <span>Novo post</span>
+          </NavLink>
 
-                <nav>
-                    <ul>
-                        <li>
-                            <a href="/home" onClick={fecharMenu}>
-                                <FaHome className="icone" />
-                                <span>Página Inicial</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/explorar" onClick={fecharMenu}>
-                                <MdExplore className="icone" />
-                                <span>Explorar</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/notificacoes" onClick={fecharMenu}>
-                                <FaBell className="icone" />
-                                <span>Notificações</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/minhaempresa" onClick={fecharMenu}>
-                                <IoIosBusiness className="icone" />
-                                <span>Minha Empresa</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/mensagens" onClick={fecharMenu}>
-                                <FaEnvelope className="icone" />
-                                <span>Mensagens</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/perfil" onClick={fecharMenu}>
-                                <FaUser className="icone" />
-                                <span>Perfil</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/configuracoes" onClick={fecharMenu}>
-                                <FaCog className="icone" />
-                                <span>Configurações</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" onClick={handleLogout}>
-                                <FaSignOutAlt className="icone" />
-                                <span>Sair</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-
-                <button className="btn-post">
-                    <a href="/postagem" onClick={fecharMenu}>
-                        <span>+ Novo Post</span>
-                    </a>
-                </button>
-            </aside>
-        </>
-    );
+          <button type="button" className="logout-btn" onClick={handleLogout}>
+            <FaSignOutAlt className="icone" />
+            <span>Sair</span>
+          </button>
+        </div>
+      </aside>
+    </>
+  );
 }
+

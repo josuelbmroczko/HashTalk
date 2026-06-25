@@ -1,0 +1,10 @@
+.search {
+  display: grid;
+  gap: 12px;
+}
+
+.search label {
+  color: var(--color-muted-strong);
+  font-size: 0.86rem;
+  font-weight: 760;
+}

@@ -1,0 +1,17 @@
+.sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sugestoes button {
+  min-height: 32px;
+  padding: 5px 10px;
+  color: var(--color-primary-dark);
+  background: var(--color-primary-soft);
+  border: 1px solid rgba(6, 148, 162, 0.18);
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 720;
+  cursor: pointer;
+}

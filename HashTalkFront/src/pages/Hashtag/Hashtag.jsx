@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import MenuLateral from '../../componentes/menuLateral';
+import { API_URL } from '../../config/api';
 import './Hashtag.css';
 
 export default function Hashtag() {
@@ -12,7 +13,7 @@ export default function Hashtag() {
         const fetchPosts = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts/hashtag/${hashtag}`, {
+                const response = await fetch(`${API_URL}/api/posts/hashtag/${hashtag}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

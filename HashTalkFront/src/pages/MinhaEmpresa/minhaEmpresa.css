@@ -1,0 +1,70 @@
+.empresa-page {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.empresa-panel {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.empresa-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.empresa-panel-header h2,
+.empresa-panel-header p {
+  margin: 0;
+}
+
+.empresa-panel-header h2 {
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.empresa-panel-header p {
+  margin-top: 3px;
+  color: var(--color-muted);
+}
+
+.empresa-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.empresa-grid div {
+  padding: 16px;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.empresa-grid span,
+.empresa-grid strong {
+  display: block;
+}
+
+.empresa-grid span {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+}
+
+.empresa-grid strong {
+  margin-top: 4px;
+  color: var(--color-text);
+  font-size: 0.96rem;
+}
+
+@media (max-width: 700px) {
+  .empresa-grid {
+    grid-template-columns: 1fr;
+  }
+}
