@@ -1,0 +1,10 @@
+.pesquisa-page{
+    background: #F8FAFC;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.pesquisa-container{
+    max-width: 900px;
+    margin: auto;
+}
