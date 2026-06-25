@@ -12,7 +12,7 @@ export default function Hashtag() {
         const fetchPosts = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:3000/api/posts/hashtag/${hashtag}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts/hashtag/${hashtag}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

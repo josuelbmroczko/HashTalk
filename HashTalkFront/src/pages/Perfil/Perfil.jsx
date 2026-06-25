@@ -12,7 +12,7 @@ function Perfil() {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://localhost:3000/api/auth/me", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -32,7 +32,7 @@ function Perfil() {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://localhost:3000/api/posts/me", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts/me`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
