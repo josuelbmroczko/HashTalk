@@ -29,16 +29,20 @@ export default function Home() {
             }
         };
 
-        fetchPosts();
+        fetchPosts();//chamando a função na primeira vez
+
+        const intervalo = setInterval(fetchPosts, 5000);//chama a cada 5 segundos
+
+        return () => clearInterval(intervalo)//evita o memory leak para quando o usuário sair da pagina
     }, []);
 
     return (
         <div className="app-container">
             <MenuLateral />
-            
+
             <div className="content-wrapper">
                 <main className="principal">
-                    
+
                     <header className="main-header">
                         <h2>Para você</h2>
                         <div className="tabs">
@@ -70,7 +74,7 @@ export default function Home() {
                             <p>Nenhum post encontrado.</p>
                         )}
                     </section>
-                    
+
                 </main>
             </div>
         </div>
