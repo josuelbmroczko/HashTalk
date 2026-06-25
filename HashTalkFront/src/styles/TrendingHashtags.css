@@ -1,0 +1,17 @@
+.hashtags-card{
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #E2E8F0;
+    transition: 0.2s; 
+}
+
+.hashtags-card:hover{
+    transform: translateY(-2px);
+}
+
+.hashtags-card h3{
+    color:  #1E293B;
+
+}

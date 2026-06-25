@@ -1,0 +1,79 @@
+[
+    {
+        "id": 1,
+        "nome": "#tecnologia",
+        "posts": 125000
+    }, 
+
+    {
+        "id": 2,
+        "nome": "#desenvolvimento",
+        "posts": 96000
+    },
+    {
+        "id": 3,
+        "nome": "#designer",
+        "posts": 76000
+    },
+    {
+        "id": 4,
+        "nome": "#inovacao",
+        "posts": 64000
+    },
+    {
+        "id": 5,
+        "nome": "#parcerias",
+        "posts": 54000
+    },
+    {
+        "id": 6,
+        "nome": "#OpenIA",
+        "posts": 45000
+    },
+    {
+        "id": 7,
+        "nome": "#desenvolvimentocomIa",
+        "posts": 325000
+    },
+    {
+        "id": 8,
+        "nome": "#inovacaocomIa",
+        "posts": 65000
+
+    },
+    {
+        "id": 9,
+        "nome": "#negociacoes",
+        "posts": 75000
+    },
+    {
+        "id": 10,
+        "nome": "#empreendimentos",
+        "posts": 150000
+    },
+    {
+        "id": 11,
+        "nome": "#marketing",
+        "posts": 8000
+    },
+    {
+        "id":12,
+        "nome":"#produtividade",
+        "posts":95000
+    },
+    {
+        "id":13,
+        "nome":"#programacao",
+        "posts":35000
+    },
+    {
+        "id":14,
+        "nome":"#pequenasempresas",
+        "posts": 45000
+    },
+    {
+        "id":15,
+        "nome":"#grandesnegocios"
+    }
+
+]

@@ -1,0 +1,15 @@
+.sugestoes {
+  margin-top: 5px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+.sugestao-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.sugestao-item:hover {
+  background: #F1F5F9;
+}
