@@ -1,14 +1,21 @@
-import { FaHome, FaBell, FaEnvelope, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaHome, FaBell, FaEnvelope, FaUser, FaCog, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import { IoIosBusiness } from 'react-icons/io';
 import { MdExplore } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.jpeg';
-import './MenuLateral.css';
+import './menuLateral.css';
 
 export default function MenuLateral() {
     const navigate = useNavigate();
+    const [menuAberto, setMenuAberto] = useState(false);
 
-    const handleLogout = async () => {
+    const fecharMenu = () => setMenuAberto(false);
+
+    const handleLogout = async (event) => {
+        event.preventDefault();
+        fecharMenu();
+
         try {
             const token = localStorage.getItem('token');
             if (token) {
@@ -27,69 +34,97 @@ export default function MenuLateral() {
     };
 
     return (
-        <aside className='lateralMenu'>
-            <div className="img-logo">
-                <img src={logo} alt="Logo" />
-            </div>
-
-            <nav>
-                <ul>
-                    <li>
-                        <a href='/home'>
-                            <FaHome className="icone"/>
-                            <span>Página Inicial</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='/explorar'>
-                            <MdExplore className="icone"/>
-                            <span>Explorar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='/notificacoes'>
-                            <FaBell className="icone"/>
-                            <span>Notificações</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='/minhaempresa'>
-                            <IoIosBusiness className="icone"/>
-                            <span>Minha Empresa</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='/mensagens'>
-                            <FaEnvelope className="icone"/>
-                            <span>Mensagens</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='/perfil'>
-                            <FaUser className="icone"/>
-                            <span>Perfil</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='/configuracoes'>
-                            <FaCog className="icone"/>
-                            <span>Configurações</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='#' onClick={handleLogout}>
-                            <FaSignOutAlt className="icone"/>
-                            <span>Sair</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <button className="btn-post">
-                <a href='/postagem'> 
-                    <span>+ Novo Post</span>
-                </a>
+        <>
+            <button
+                type="button"
+                className="hamburger-btn"
+                onClick={() => setMenuAberto(true)}
+                aria-label="Abrir menu"
+                aria-expanded={menuAberto}
+                aria-controls="menu-lateral"
+            >
+                <FaBars />
             </button>
-        </aside>
+
+            <div
+                className={`menu-overlay ${menuAberto ? 'active' : ''}`}
+                onClick={fecharMenu}
+                aria-hidden="true"
+            />
+
+            <aside id="menu-lateral" className={`lateralMenu ${menuAberto ? 'menu-open' : ''}`}>
+                <button
+                    type="button"
+                    className="close-menu-btn"
+                    onClick={fecharMenu}
+                    aria-label="Fechar menu"
+                >
+                    <FaTimes />
+                </button>
+
+                <div className="img-logo">
+                    <img src={logo} alt="Logo" />
+                </div>
+
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="/home" onClick={fecharMenu}>
+                                <FaHome className="icone" />
+                                <span>Página Inicial</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/explorar" onClick={fecharMenu}>
+                                <MdExplore className="icone" />
+                                <span>Explorar</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/notificacoes" onClick={fecharMenu}>
+                                <FaBell className="icone" />
+                                <span>Notificações</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/minhaempresa" onClick={fecharMenu}>
+                                <IoIosBusiness className="icone" />
+                                <span>Minha Empresa</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/mensagens" onClick={fecharMenu}>
+                                <FaEnvelope className="icone" />
+                                <span>Mensagens</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/perfil" onClick={fecharMenu}>
+                                <FaUser className="icone" />
+                                <span>Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/configuracoes" onClick={fecharMenu}>
+                                <FaCog className="icone" />
+                                <span>Configurações</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" onClick={handleLogout}>
+                                <FaSignOutAlt className="icone" />
+                                <span>Sair</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <button className="btn-post">
+                    <a href="/postagem" onClick={fecharMenu}>
+                        <span>+ Novo Post</span>
+                    </a>
+                </button>
+            </aside>
+        </>
     );
 }
