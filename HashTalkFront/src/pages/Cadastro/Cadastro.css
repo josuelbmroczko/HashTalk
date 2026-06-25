@@ -1,0 +1,252 @@
+/* --- ESTILOS GERAIS --- */
+
+.cadastro-page {
+  min-height: 100vh;
+  background-color: #F8FAFC;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: #1E293B;
+}
+
+.cadastro-card {
+  width: 100%;
+  max-width: 1200px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.cadastro-side {
+  width: 300px;
+  background: #F0F9FB;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.logo-cadastro {
+  width: 110px;
+  height: auto;
+  border-radius: 12px;
+  mix-blend-mode: multiply;
+}
+
+.cadastro-side p {
+  color: #64748B;
+  font-size: 14px;
+  max-width: 180px;
+  line-height: 1.5;
+}
+
+.cadastro-content {
+  flex: 1;
+  padding: 50px 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.brand {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.brand-logo {
+  width: 85px;
+  height: auto;
+  mix-blend-mode: multiply;
+}
+
+.cadastro-content h1 {
+  margin: 0;
+  font-size: 26px;
+  text-align: left;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.subtitle {
+  margin: 4px 0 32px;
+  color: #64748B;
+  text-align: left;
+  font-size: 14px;
+}
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.cadastro-form > div,
+.form-row div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cadastro-form label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  text-align: left;
+}
+
+.cadastro-form input {
+  height: 48px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 0 16px;
+  outline: none;
+  color: #1E293B;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.cadastro-form input::placeholder {
+  color: #94A3B8;
+}
+
+.cadastro-form input:focus {
+  border-color: #0891B2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.cadastro-form button {
+  height: 48px;
+  margin-top: 12px;
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.cadastro-form button:hover {
+  border-color: #0891B2;
+  color: #0891B2;
+  background-color: #F8FAFC;
+}
+
+.login-text {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: #64748B;
+  width: 100%;
+}
+
+.login-text a,
+.login-text button {
+  color: #0891B2;
+  font-weight: 600;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.login-text a:hover,
+.login-text button:hover {
+  text-decoration: underline;
+}
+
+.mensagem-erro {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #DC2626;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.mensagem-sucesso {
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #059669;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.mensagem-cadastro {
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  text-align: center;
+  color: #DC2626;
+  background-color: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* --- RESPONSIVIDADE --- */
+
+@media (max-width: 768px) {
+  .cadastro-card {
+    flex-direction: column;
+  }
+
+  .cadastro-side {
+    width: 100%;
+    padding: 32px 24px;
+  }
+
+  .cadastro-content {
+    padding: 32px 24px;
+    align-items: center;
+  }
+
+  .cadastro-content h1,
+  .subtitle,
+  .cadastro-form label {
+    text-align: left;
+    width: 100%;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .mensagem-erro,
+  .mensagem-sucesso,
+  .mensagem-cadastro {
+    width: 100%;
+    margin-top: 16px;
+  }
+}

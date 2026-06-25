@@ -1,14 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Routes, Route } from "react-router-dom";
+import "./App.css";
+
+import Home from "./pages/Home/Home";
+import Postagem from "./pages/Postagem/Postagem";
+import SplashPage from "./pages/Splash/SplashPage";
+import LoginPage from "./pages/Login/LoginPage";
+import Cadastro from "./pages/Cadastro/Cadastro";
+import Perfil from "./pages/Perfil/Perfil";
+import Hashtag from "./pages/Hashtag/Hashtag";
+import Configuracoes from "./pages/Configuracoes/Configuracoes";
 
 function App() {
-  const [count, setCount] = useState(0)
-  
+
   return (
- <>
+    <>
       <section id="center">
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
@@ -115,7 +120,8 @@ function App() {
 
       <div className="ticks"></div>
       <section id="spacer"></section>
-      
-</>
+    </>
   )
 }
+
+export default App

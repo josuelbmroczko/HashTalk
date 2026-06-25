@@ -37,15 +37,11 @@ const cadastrarUsuario = async (req, res) => {
         res.status(201).json({ message: 'Usuário cadastrado com sucesso!', usuario });
     } catch (error) {
         if (error.code === 'P2002') {
-            console.warn('Tentativa de cadastro com username/email duplicado rejeitada.');
             return res.status(400).json({ error: 'Username ou email já estão em uso.' });
         }
-        
         if (error.code === 'P2003') {
-            console.warn('Tentativa de cadastro com empresa_id inexistente rejeitada.');
             return res.status(400).json({ error: 'A empresa informada (empresa_id) não existe no sistema.' });
         }
-        
         console.error('Erro ao cadastrar usuário:', error);
         res.status(500).json({ error: 'Erro interno no servidor ao cadastrar usuário.' });
     }
@@ -53,18 +49,11 @@ const cadastrarUsuario = async (req, res) => {
 
 const listarUsuarios = async (req, res) => {
     try {
-        // Buscamos os usuários e omitimos a senha por segurança
         const usuarios = await prisma.usuario.findMany({
             select: {
-                id: true,
-                nomecompleto: true,
-                username: true,
-                email: true,
-                role: true,
-                cargo_responsavel: true,
-                nome_empresa: true,
-                empresa_id: true,
-                criado_em: true
+                id: true, nomecompleto: true, username: true, email: true,
+                role: true, cargo_responsavel: true, nome_empresa: true,
+                empresa_id: true, criado_em: true
             }
         });
         res.json(usuarios);
@@ -79,18 +68,9 @@ const listarFuncionarios = async (req, res) => {
         const funcionarios = await prisma.usuario.findMany({
             where: { role: 'FUNCIONARIO' },
             select: {
-                id: true,
-                nomecompleto: true,
-                username: true,
-                email: true,
-                role: true,
-                criado_em: true,
-                empresa: {
-                    select: {
-                        id: true,
-                        nome_empresa: true
-                    }
-                }
+                id: true, nomecompleto: true, username: true, email: true,
+                role: true, criado_em: true,
+                empresa: { select: { id: true, nome_empresa: true } }
             }
         });
         res.json(funcionarios);
@@ -105,21 +85,10 @@ const listarEmpresas = async (req, res) => {
         const empresas = await prisma.usuario.findMany({
             where: { role: 'EMPRESA' },
             select: {
-                id: true,
-                nomecompleto: true,
-                username: true,
-                email: true,
-                role: true,
-                cargo_responsavel: true,
-                nome_empresa: true,
+                id: true, nomecompleto: true, username: true, email: true,
+                role: true, cargo_responsavel: true, nome_empresa: true,
                 criado_em: true,
-                funcionarios: {
-                    select: {
-                        id: true,
-                        nomecompleto: true,
-                        username: true
-                    }
-                }
+                funcionarios: { select: { id: true, nomecompleto: true, username: true } }
             }
         });
         res.json(empresas);
@@ -129,9 +98,43 @@ const listarEmpresas = async (req, res) => {
     }
 };
 
+// --- FUNÇÃO ADICIONADA: Busca perfil + contagem de posts ---
+const getPerfilUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const usuarioId = parseInt(id);
+
+        // 1. Busca o usuário
+        const usuario = await prisma.usuario.findUnique({ 
+            where: { id: usuarioId },
+            select: {
+                id: true, nomecompleto: true, username: true, email: true,
+                role: true, cargo_responsavel: true, nome_empresa: true,
+                criado_em: true
+            }
+        });
+
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
+
+        // 2. Conta os posts deste usuário
+        const totalPosts = await prisma.post.count({
+            where: { usuario_id: usuarioId }
+        });
+
+        // 3. Retorna os dados combinados
+        res.json({ ...usuario, totalPosts });
+    } catch (error) {
+        console.error('Erro ao buscar perfil do usuário:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar perfil.' });
+    }
+};
+
 module.exports = {
     cadastrarUsuario,
     listarUsuarios,
     listarFuncionarios,
-    listarEmpresas
+    listarEmpresas,
+    getPerfilUsuario // Exportação atualizada
 };
