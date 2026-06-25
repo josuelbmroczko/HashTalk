@@ -121,7 +121,7 @@ li a:hover {
   min-height: 100vh;
 }
 
-/* --- CABEÇALHO DO FEED --- */
+/* --- CABEÃ‡ALHO DO FEED --- */
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -290,7 +290,7 @@ li a:hover {
   border-color: #00a8b5;
 }
 
-/* --- BOTÕES DE AÇÃO --- */
+/* --- BOTÃ•ES DE AÃ‡ÃƒO --- */
 .acoes-post {
   display: flex;
   gap: 12px;

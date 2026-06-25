@@ -160,7 +160,7 @@ body {
   width: 100%;
 }
 
-/* Títulos */
+/* TÃ­tulos */
 .splash-title-section {
   margin-bottom: 30px;
   animation: fadeInRight 0.8s ease-out 0.1s both;
@@ -192,7 +192,7 @@ body {
   background-clip: initial;
 }
 
-/* Descrição */
+/* DescriÃ§Ã£o */
 .splash-description {
   margin: 25px 0 40px;
   animation: fadeInRight 0.8s ease-out 0.3s both;
@@ -214,7 +214,7 @@ body {
   font-weight: 700;
 }
 
-/* Ações */
+/* AÃ§Ãµes */
 .splash-actions {
   display: flex;
   flex-direction: column;
@@ -353,7 +353,7 @@ body {
   color: #0891b2;
 }
 
-/* ========== ANIMAÇÕES ========== */
+/* ========== ANIMAÃ‡Ã•ES ========== */
 @keyframes fadeInLeft {
   from {
     opacity: 0;
@@ -586,7 +586,7 @@ body {
   }
 }
 
-/* ========== CORREÇÃO PARA O BOTÃO COMEÇAR ========== */
+/* ========== CORREÃ‡ÃƒO PARA O BOTÃƒO COMEÃ‡AR ========== */
 .btn-start:active {
   transform: scale(0.96);
 }
@@ -612,3 +612,4 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #0e7490;
 }
+

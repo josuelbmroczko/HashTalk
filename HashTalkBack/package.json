@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "node -e \"const fs=require('fs'); if(!fs.existsSync('.env')) fs.copyFileSync('.env.example', '.env');\"",
+    "postinstall": "node -e \"const fs=require('fs'); if(!fs.existsSync('.env')) fs.copyFileSync('.env.example', '.env');\" && npx prisma generate",
     "predev": "docker compose up -d && node -e \"setTimeout(()=>{}, 3000)\" && npx prisma migrate deploy && npx prisma generate",
     "dev": "nodemon server.js",
     "start": "node server.js",
