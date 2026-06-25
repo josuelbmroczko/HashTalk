@@ -1,6 +1,6 @@
 import MenuLateral from '../../componentes/menuLateral';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.jpeg'
 import './Postagem.css';
 
@@ -8,14 +8,46 @@ export default function Postagem() {
     const [texto, setTexto] = useState('');
     const [visibilidade, setVisibilidade] = useState('parceiros');
     const [loading, setLoading] = useState(false);
+    const [posts, setPosts] = useState([]);
+    const [loadingPosts, setLoadingPosts] = useState(true);
     const [userInfo, setUserInfo] = useState(null);
-    const navigate = useNavigate();
+
+    const fetchPosts = async ({ silent = false } = {}) => {
+        if (!silent) {
+            setLoadingPosts(true);
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setPosts(data.posts || []);
+            } else {
+                console.error("Erro ao buscar posts:", data.error);
+            }
+        } catch (error) {
+            console.error("Erro ao carregar posts:", error);
+        } finally {
+            setLoadingPosts(false);
+        }
+    };
 
     useEffect(() => {
         const user = localStorage.getItem('usuario');
         if (user) {
             setUserInfo(JSON.parse(user));
         }
+
+        fetchPosts();
+        const intervalo = setInterval(() => fetchPosts({ silent: true }), 5000);
+
+        return () => clearInterval(intervalo);
     }, []);
 
     const handlePublicar = async () => {
@@ -35,7 +67,7 @@ export default function Postagem() {
             if (response.ok) {
                 setTexto('');
                 alert("Post publicado com sucesso!");
-                navigate("/home");
+                await fetchPosts({ silent: true });
             } else {
                 const data = await response.json();
                 alert(data.error || "Erro ao publicar");
@@ -150,6 +182,33 @@ export default function Postagem() {
                             </button>
                         </div>
 
+                    </section>
+
+                    <section className="feed feed-posts">
+                        <h2>Posts recentes</h2>
+
+                        {loadingPosts ? (
+                            <p>Carregando posts...</p>
+                        ) : posts.length > 0 ? (
+                            posts.map((post) => (
+                                <article className="post" key={post.id}>
+                                    <strong>{post.usuario?.nome_empresa || post.usuario?.nomecompleto || "Usuario"}</strong>
+                                    <p>{post.content}</p>
+
+                                    {post.hashtags && post.hashtags.length > 0 && (
+                                        <p className="post-hashtags">
+                                            {post.hashtags.map((tag, idx) => (
+                                                <Link to={`/hashtag/${tag.replace('#', '')}`} key={idx}>
+                                                    {tag}
+                                                </Link>
+                                            ))}
+                                        </p>
+                                    )}
+                                </article>
+                            ))
+                        ) : (
+                            <p>Nenhum post encontrado.</p>
+                        )}
                     </section>
                 </main>
             </div>

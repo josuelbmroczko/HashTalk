@@ -1,129 +1,191 @@
-/* --- LAYOUT DA PÃGINA --- */
-.perfil-container {
+.perfil-page {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  border-left: 1px solid #eee;
-  border-right: 1px solid #eee;
+  background: #ffffff;
   min-height: 100vh;
+  border-right: 1px solid #e2e8f0;
+}
+
+.perfil-card {
+  width: 100%;
+  max-width: 760px;
+  min-height: 100vh;
+  margin: 0 auto;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.perfil-conteudo {
+  width: 100%;
 }
 
 .perfil-capa {
   height: 200px;
-  background-color: #3d99a3;
+  background: #3d99a3;
 }
 
-.perfil-header {
+.perfil-info {
   position: relative;
-  padding: 0 20px;
+  padding: 0 24px 18px;
 }
 
-.avatar-grande {
+.avatar {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   background: #9ab4b6;
-  color: white;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  font-weight: bold;
-  border: 4px solid #fff;
+  font-weight: 700;
+  border: 4px solid #ffffff;
   margin-top: -60px;
 }
 
-.btn-editar {
+.editar-perfil {
   position: absolute;
-  top: 10px;
-  right: 20px;
+  top: 16px;
+  right: 24px;
   padding: 8px 20px;
-  border-radius: 20px;
+  border-radius: 9999px;
   border: 1px solid #00a8b5;
-  background: white;
+  background: #ffffff;
   color: #00a8b5;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.info-texto {
-  margin-top: 15px;
-  margin-bottom: 15px;
+.editar-perfil:hover {
+  background: #e6f8fa;
 }
-.username {
+
+.perfil-info h1 {
+  margin: 16px 0 6px;
+  font-size: 28px;
+  color: #1e293b;
+}
+
+.perfil-info .user {
+  margin: 0 0 12px;
   color: #64748b;
 }
 
-/* Stats */
-.perfil-stats {
+.perfil-info .bio {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.perfil-numeros {
   display: flex;
-  gap: 30px;
-  padding: 20px;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+  gap: 32px;
+  padding: 18px 24px;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
-.perfil-stats strong {
-  display: block;
-  font-size: 18px;
+
+.perfil-numeros strong {
   color: #1e293b;
+  font-size: 18px;
 }
-.perfil-stats span {
+
+.perfil-numeros span {
   color: #64748b;
   font-size: 14px;
 }
 
-/* Tabs */
 .perfil-tabs {
   display: flex;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e2e8f0;
 }
+
 .perfil-tabs button {
   flex: 1;
   padding: 15px;
   border: none;
-  background: none;
-  font-weight: 600;
+  background: transparent;
   color: #64748b;
+  font-weight: 600;
   cursor: pointer;
 }
-.perfil-tabs .ativa {
+
+.perfil-tabs .tab-ativa {
   border-bottom: 3px solid #00a8b5;
   color: #00a8b5;
 }
 
-/* Feed */
 .post-card {
-  padding: 20px;
-  border-bottom: 1px solid #eee;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* --- ADAPTAÃ‡ÃƒO PARA TELA PEQUENA (MOBILE) --- */
-@media (max-width: 600px) {
-  .perfil-container {
+.post-card p {
+  margin: 0 0 14px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.post-acoes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.post-acoes small {
+  margin-left: auto;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .perfil-card {
+    max-width: none;
     border-left: none;
     border-right: none;
   }
+}
 
-  .perfil-header {
-    padding: 0 15px;
+@media (max-width: 600px) {
+  .perfil-capa {
+    height: 150px;
   }
 
-  .avatar-grande {
-    width: 100px; /* Um pouco menor em telas muito pequenas */
-    height: 100px;
+  .perfil-info {
+    padding: 0 16px 16px;
+  }
+
+  .avatar {
+    width: 96px;
+    height: 96px;
     font-size: 30px;
-    margin-top: -50px;
+    margin-top: -48px;
   }
 
-  .btn-editar {
-    top: 5px;
-    right: 10px;
-    padding: 6px 15px;
+  .editar-perfil {
+    top: 10px;
+    right: 16px;
+    padding: 7px 14px;
     font-size: 12px;
   }
 
-  .perfil-stats {
-    gap: 15px; /* Diminui o espaÃ§amento dos nÃºmeros */
-    justify-content: space-around;
+  .perfil-info h1 {
+    font-size: 24px;
+  }
+
+  .perfil-numeros {
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .perfil-tabs button {
+    padding: 13px 8px;
+  }
+
+  .post-card {
+    padding: 18px 16px;
   }
 }
