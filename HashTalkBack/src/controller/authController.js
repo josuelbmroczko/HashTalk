@@ -68,6 +68,12 @@ class AuthController {
                 });
             }
 
+            if (error.code === 'P2002') {
+                return res.status(409).json({
+                    error: 'Este email ou nome de usuário já está em uso por outra conta.'
+                });
+            }
+
             res.status(500).json({ error: 'Erro ao criar usuario' });
         }
     }

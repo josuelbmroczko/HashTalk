@@ -1,5 +1,6 @@
-import MenuLateral from '../componentes/menuLateral';
+import MenuLateral from '../../componentes/menuLateral';
 import { useState } from 'react';
+import './Configuracoes.css';
 
 export default function Configuracoes() {
   const [nomeUsuario, setNomeUsuario] = useState('');

@@ -1,23 +1,26 @@
 const prisma = require('../database/prismaClient');
+const geminiService = require('../service/geminiService');
 
 class HashtagController {
-    createHashtags(req, res) {
+    async createHashtags(req, res) {
         try {
-            const { hashtags } = req.body;
+            const { texto } = req.body;
 
-            if (!hashtags || !Array.isArray(hashtags)) {
+            if (!texto) {
                 return res.status(400).json({
-                    error: 'Lista de hashtags e obrigatoria'
+                    error: 'Texto e obrigatorio'
                 });
             }
 
+            const hashtags = await geminiService.generateHashTags(texto);
+
             res.status(201).json({
-                message: 'Hashtags processadas com sucesso',
+                message: 'Hashtags geradas com sucesso',
                 hashtags
             });
         } catch (error) {
-            console.error('Erro ao criar hashtags:', error);
-            res.status(500).json({ error: 'Erro ao processar hashtags' });
+            console.error('Erro ao gerar hashtags:', error);
+            res.status(500).json({ error: 'Erro ao gerar hashtags com IA', details: error.message, stack: error.stack });
         }
     }
 

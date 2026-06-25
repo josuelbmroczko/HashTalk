@@ -10,10 +10,14 @@ function Cadastro() {
   const [cargo, setCargo] = useState("");
   const [emailCorporativo, setEmailCorporativo] = useState("");
   const [senha, setSenha] = useState("");
-  const [mensagem, setMensagem] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    setErrorMsg("");
+    setSuccessMsg("");
 
     const dadosCadastro = {
       nomeEmpresa,
@@ -39,11 +43,11 @@ function Cadastro() {
       const resultado = await resposta.json();
 
       if (!resposta.ok) {
-        setMensagem(resultado.error || "Erro ao cadastrar empresa.");
+        setErrorMsg(resultado.error || "Erro ao cadastrar empresa.");
         return;
       }
 
-      setMensagem("Empresa cadastrada com sucesso!");
+      setSuccessMsg("Empresa cadastrada com sucesso!");
 
       // Limpa os campos após o cadastro
       setNomeEmpresa("");
@@ -56,7 +60,7 @@ function Cadastro() {
       navigate("/login");
     } catch (error) {
       console.error("Erro ao conectar com o servidor:", error);
-      setMensagem("Erro ao conectar com o servidor.");
+      setErrorMsg("Erro ao conectar com o servidor.");
     }
   };
 
@@ -164,10 +168,16 @@ function Cadastro() {
             </button>
           </form>
 
-          {mensagem && (
-            <p className="mensagem-cadastro">
-              {mensagem}
-            </p>
+          {errorMsg && (
+            <div className="mensagem-erro">
+              {errorMsg}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="mensagem-sucesso">
+              {successMsg}
+            </div>
           )}
 
           <p className="login-text">

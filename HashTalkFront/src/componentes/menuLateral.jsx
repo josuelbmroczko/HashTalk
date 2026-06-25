@@ -1,10 +1,30 @@
 //icones para o menu lateral
-import { FaHome, FaBell, FaEnvelope, FaUser, FaCog } from 'react-icons/fa';
+import { FaHome, FaBell, FaEnvelope, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { IoIosBusiness } from 'react-icons/io';
 import { MdExplore } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.jpeg'
 
 export default function MenuLateral() {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (token) {
+                await fetch('http://localhost:3000/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            }
+        } catch (error) {
+            console.error('Erro no logout', error);
+        } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            navigate('/login');
+        }
+    };
     return (
         //redirecionando o menu lateral
         <aside className='lateralMenu'>
@@ -12,10 +32,10 @@ export default function MenuLateral() {
                 <img src={logo} alt="Logo" />
             </div>
 
-            <navbar>
+            <nav>
                 <ul>
                     <li>
-                        <a href='/'>
+                        <a href='/home'>
                             <FaHome className="icone"/>
                             <span>Página Inicial</span>
                         </a>
@@ -56,9 +76,15 @@ export default function MenuLateral() {
                             <span>Configurações</span>
                         </a>
                     </li>
+                    <li>
+                        <a href='#' onClick={handleLogout}>
+                            <FaSignOutAlt className="icone"/>
+                            <span>Sair</span>
+                        </a>
+                    </li>
                 </ul>
 
-            </navbar>
+            </nav>
 
             <button className="btn-post">
                 <a href='/postagem'> 

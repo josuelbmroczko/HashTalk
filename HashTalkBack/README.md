@@ -1,4 +1,4 @@
-﻿# HashTalk API
+# HashTalk API
 
 Uma API em Node.js com integração de Inteligência Artificial para gerenciar postagens e gerar hashtags automaticamente.
 
@@ -28,34 +28,106 @@ Para facilitar o uso por qualquer pessoa da equipe, o projeto foi totalmente aut
 
 ## Endpoints da API (Testando no Postman)
 
-### 1. Listar Postagens
-- **Método:** `GET`
-- **URL:** `http://localhost:3000/api/posts`
+> **Atenção:** As rotas de Postagens e Hashtags agora são **protegidas**. Você deve enviar no Header da requisição o Token JWT retornado no login.  
+> Exemplo: `Authorization: Bearer seu_token_aqui`
 
-### 2. Criar uma Nova Postagem
+### Autenticação
+
+#### 1. Registrar Usuário (Empresa ou Funcionário)
 - **Método:** `POST`
-- **URL:** `http://localhost:3000/api/posts`
+- **URL:** `http://localhost:3000/api/auth/register`
 - **Body (JSON):**
   ```json
   {
-    "usuario_id": 25,
+    "nomeEmpresa": "Tech Solutions",
+    "nomeFuncionario": "João Silva",
+    "cargoFuncionario": "CEO",
+    "emailInstitucional": "joao@techsolutions.com",
+    "senha": "senha_segura_123",
+    "role": "EMPRESA"
+  }
+  ```
+
+#### 2. Login
+- **Método:** `POST`
+- **URL:** `http://localhost:3000/api/auth/login`
+- **Body (JSON):**
+  ```json
+  {
+    "emailInstitucional": "joao@techsolutions.com",
+    "senha": "senha_segura_123"
+  }
+  ```
+  *(Retorna o Token JWT)*
+
+#### 3. Verificar Token
+- **Método:** `GET`
+- **URL:** `http://localhost:3000/api/auth/verify`
+- **Headers:** `Authorization: Bearer <token>`
+
+#### 4. Dados do Usuário
+- **Método:** `GET`
+- **URL:** `http://localhost:3000/api/auth/me`
+- **Headers:** `Authorization: Bearer <token>`
+
+#### 5. Logout
+- **Método:** `POST`
+- **URL:** `http://localhost:3000/api/auth/logout`
+- **Headers:** `Authorization: Bearer <token>`
+
+---
+
+### Postagens (Exigem Token)
+
+#### 6. Listar Todas as Postagens
+- **Método:** `GET`
+- **URL:** `http://localhost:3000/api/posts`
+- **Headers:** `Authorization: Bearer <token>`
+
+#### 7. Criar uma Nova Postagem
+- **Método:** `POST`
+- **URL:** `http://localhost:3000/api/posts`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body (JSON):**
+  ```json
+  {
     "content": "Construindo minha própria API com Node.js e inteligência artificial!"
   }
   ```
 
-### 3. Listar Postagens de um Usuário Específico (Seja funcionário ou conta de empresa)
+#### 8. Meus Posts
 - **Método:** `GET`
-- **URL:** `http://localhost:3000/api/posts/usuario/25`
-*(Substitua o `25` pelo ID real do usuário que você deseja ver as postagens isoladas)*
+- **URL:** `http://localhost:3000/api/posts/me`
+- **Headers:** `Authorization: Bearer <token>`
 
-### 4. Listar Postagens da Rede de uma Empresa (A Empresa + Todos seus Funcionários)
+#### 9. Posts por Usuário Específico
 - **Método:** `GET`
-- **URL:** `http://localhost:3000/api/posts/empresa/1`
-*(Substitua o `1` pelo ID da Empresa. Ele trará tudo que a empresa postou E tudo que os funcionários atrelados a ela postaram!)*
+- **URL:** `http://localhost:3000/api/posts/usuario/:id`
+- **Headers:** `Authorization: Bearer <token>`
 
-### 5. Gerar Hashtags
+#### 10. Posts por Empresa (Empresa + Funcionários)
+- **Método:** `GET`
+- **URL:** `http://localhost:3000/api/posts/empresa/:empresaId`
+- **Headers:** `Authorization: Bearer <token>`
+
+#### 11. Posts por Hashtag
+- **Método:** `GET`
+- **URL:** `http://localhost:3000/api/posts/hashtag/:tag`
+- **Headers:** `Authorization: Bearer <token>`
+
+#### 12. Deletar Post
+- **Método:** `DELETE`
+- **URL:** `http://localhost:3000/api/posts/:id`
+- **Headers:** `Authorization: Bearer <token>`
+
+---
+
+### Hashtags (Exigem Token)
+
+#### 13. Gerar Hashtags (IA)
 - **Método:** `POST`
 - **URL:** `http://localhost:3000/api/hashtags`
+- **Headers:** `Authorization: Bearer <token>`
 - **Body (JSON):**
   ```json
   {
@@ -63,47 +135,12 @@ Para facilitar o uso por qualquer pessoa da equipe, o projeto foi totalmente aut
   }
   ```
 
-### 6. Listar Todos os Usuários
+#### 14. Listar Todas as Hashtags
 - **Método:** `GET`
-- **URL:** `http://localhost:3000/api/usuarios`
+- **URL:** `http://localhost:3000/api/hashtags`
+- **Headers:** `Authorization: Bearer <token>`
 
-### 7. Listar Funcionários (Apenas)
+#### 15. Hashtags Mais Populares
 - **Método:** `GET`
-- **URL:** `http://localhost:3000/api/usuarios/funcionarios`
-*(Retorna todos os funcionários e os dados resumidos da empresa a qual eles pertencem)*
-
-### 8. Listar Empresas (Apenas)
-- **Método:** `GET`
-- **URL:** `http://localhost:3000/api/usuarios/empresas`
-*(Retorna todas as empresas cadastradas e a lista de funcionários vinculados a elas)*
-
-### 9. Cadastro de Usuário (Funcionário)
-- **Método:** `POST`
-- **URL:** `http://localhost:3000/api/usuarios/cadastro`
-- **Body (JSON):**
-  ```json
-  {
-    "nomecompleto": "João Silva",
-    "username": "joaosilva",
-    "email": "joao.silva@email.com",
-    "senha": "senha_segura_123",
-    "role": "FUNCIONARIO"
-  }
-  ```
-*(O `id` do usuario e gerado automaticamente. Envie `empresa_id` somente se quiser vincular o funcionario a uma empresa que ja existe.)*
-
-### 10. Cadastro de Usuário (Empresa)
-- **Método:** `POST`
-- **URL:** `http://localhost:3000/api/usuarios/cadastro`
-- **Body (JSON):**
-  ```json
-  {
-    "nomecompleto": "Maria Oliveira",
-    "username": "maria_tech",
-    "email": "contato@techsolutions.com",
-    "senha": "senha_segura_456",
-    "role": "EMPRESA",
-    "cargo_responsavel": "Diretora de RH",
-    "nome_empresa": "Tech Solutions LTDA"
-  }
-  ```
+- **URL:** `http://localhost:3000/api/hashtags/top`
+- **Headers:** `Authorization: Bearer <token>`

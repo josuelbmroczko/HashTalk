@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SplashPage.css";
 
@@ -6,6 +6,27 @@ import logoIcon from "../../assets/logo.jpeg";
 
 const SplashPage = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await fetch("http://localhost:3000/api/auth/verify", {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            navigate("/home");
+          }
+        } catch (error) {
+          console.error("Erro ao verificar token", error);
+        }
+      }
+    };
+    checkToken();
+  }, [navigate]);
 
   const handleStart = () => {
     navigate("/register");
