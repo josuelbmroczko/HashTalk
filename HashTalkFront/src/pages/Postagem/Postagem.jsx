@@ -23,7 +23,7 @@ export default function Postagem() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch("http://localhost:3000/api/posts", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export default function Postagem() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch("http://localhost:3000/api/hashtags", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/hashtags`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
