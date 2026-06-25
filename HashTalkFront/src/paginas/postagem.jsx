@@ -1,7 +1,7 @@
 import MenuLateral from '../componentes/menuLateral';
 import { useState } from 'react';
 import logo from '../imagens/logo.jpeg'
-import SecaoLateral from '../componentes/secaoLateral';
+
 
 /*
 (lado esquerdo)
