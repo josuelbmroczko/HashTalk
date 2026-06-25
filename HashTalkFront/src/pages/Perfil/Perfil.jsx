@@ -1,84 +1,154 @@
+import { useEffect, useState } from "react";
+import MenuLateral from "../../componentes/MenuLateral";
 import "./Perfil.css";
 
 function Perfil() {
+  const [userInfo, setUserInfo] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const carregarPerfil = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch("http://localhost:3000/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setUserInfo(data.usuario);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+      }
+    };
+
+    const carregarPosts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch("http://localhost:3000/api/posts/me", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setPosts(data.posts || []);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar meus posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarPerfil();
+    carregarPosts();
+  }, []);
+
+  const nomePerfil =
+    userInfo?.nomeEmpresa ||
+    userInfo?.nomeFuncionario ||
+    userInfo?.nomecompleto ||
+    "Usuário";
+
+  const cargoPerfil =
+    userInfo?.cargoFuncionario ||
+    userInfo?.cargo_responsavel ||
+    "Cargo";
+
+  const usuarioPerfil = nomePerfil
+    .toLowerCase()
+    .replace(/\s/g, "");
+
+  const iniciais = nomePerfil.substring(0, 2).toUpperCase();
+
   return (
-    <main className="perfil-page">
-      <section className="perfil-card">
-        <aside className="perfil-sidebar">
-          <div className="perfil-logo">HashTalk</div>
+    <div className="app-container">
+      <MenuLateral />
 
-          <nav>
-            <a>Página inicial</a>
-            <a>Explorar</a>
-            <a>Notificações</a>
-            <a>Mensagens</a>
-            <a>Minha empresa</a>
-            <a className="ativo">Perfil</a>
-            <a>Configurações</a>
-          </nav>
+      <div className="content-wrapper">
+        <main className="perfil-page">
+          <section className="perfil-card">
+            <section className="perfil-conteudo">
+              <div className="perfil-capa"></div>
 
-          <button className="novo-post">+ Novo post</button>
-        </aside>
+              <div className="perfil-info">
+                <div className="avatar">
+                  {iniciais}
+                </div>
 
-        <section className="perfil-conteudo">
-          <div className="perfil-capa"></div>
+                <button className="editar-perfil">
+                  Editar perfil
+                </button>
 
-          <div className="perfil-info">
-            <div className="avatar">AM</div>
+                <h1>{nomePerfil}</h1>
 
-            <button className="editar-perfil">Editar perfil</button>
+                <p className="user">
+                  @{usuarioPerfil} · {cargoPerfil}
+                </p>
 
-            <h1>Ana Martins</h1>
-            <p className="user">@anamartins · CEO na Tech Solutions</p>
+                <p className="bio">
+                  Apaixonada por tecnologia, design e inovação.
+                </p>
+              </div>
 
-            <div className="local">
-              Brasil · hashtalk.app/anamartins
-            </div>
+              <div className="perfil-numeros">
+                <div>
+                  <strong>{posts.length}</strong> <span>Posts</span>
+                </div>
 
-            <p className="bio">
-              Apaixonada por tecnologia, design e inovação. Liderando a Tech Solutions rumo ao futuro.
-            </p>
-          </div>
+                <div>
+                  <strong>842</strong> <span>Seguidores</span>
+                </div>
 
-          <div className="perfil-numeros">
-            <div>
-              <strong>128</strong>
-              <span>Posts</span>
-            </div>
-            <div>
-              <strong>842</strong>
-              <span>Seguidores</span>
-            </div>
-            <div>
-              <strong>356</strong>
-              <span>Seguindo</span>
-            </div>
-          </div>
+                <div>
+                  <strong>356</strong> <span>Seguindo</span>
+                </div>
+              </div>
 
-          <div className="perfil-tabs">
-            <button className="tab-ativa">Posts</button>
-            <button>Respostas</button>
-            <button>Curtidas</button>
-          </div>
+              <div className="perfil-tabs">
+                <button className="tab-ativa">Posts</button>
+                <button>Respostas</button>
+                <button>Curtidas</button>
+              </div>
 
-          <article className="post-card">
-            <p>Trabalhando em algo novo. Em breve, compartilho mais!</p>
+              {loading ? (
+                <p style={{ padding: "20px" }}>Carregando posts...</p>
+              ) : posts.length > 0 ? (
+                posts.map((post) => (
+                  <article className="post-card" key={post.id}>
+                    <p>{post.content}</p>
 
-            <div className="hashtags">
-              <span>#Inovação</span>
-              <span>#B2B</span>
-            </div>
-
-            <div className="post-acoes">
-              <span>♡ 23</span>
-              <span>💬 7</span>
-              <span>↗ 15</span>
-              <small>2h atrás</small>
-            </div>
-          </article>
-        </section>
-      </section>
-    </main>
+                    <div className="post-acoes">
+                      <span>♡ 0</span>
+                      <span>💬 0</span>
+                      <small>
+                        {post.created_at
+                          ? new Date(post.created_at).toLocaleDateString()
+                          : ""}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p style={{ padding: "20px" }}>
+                  Nenhum post encontrado.
+                </p>
+              )}
+            </section>
+          </section>
+        </main>
+      </div>
+    </div>
   );
 }
 

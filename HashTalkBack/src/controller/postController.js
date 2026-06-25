@@ -78,7 +78,8 @@ const createPost = async (req, res) => {
         console.error('Erro ao criar postagem:', error);
         res.status(500).json({
             error: 'Erro interno ao criar postagem.',
-            details: error.message
+            details: error.message,
+            stack: error.stack
         });
     }
 };

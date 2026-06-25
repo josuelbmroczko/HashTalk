@@ -1,35 +1,28 @@
+import { Routes, Route } from "react-router-dom";
+import "./App.css";
 
-import { Routes, Route } from 'react-router-dom';
-import { useState } from 'react'
-
-import './App.css'
-import Home from './paginas/home'
-import Postagem from './paginas/postagem';
-import Explorar from './paginas/explorar';
-import Notificacoes from './paginas/notificacoes';
-import MinhaEmpresa from './paginas/minhaempresa';
-import Mensagens from './paginas/mensagens';
-import Perfil from './paginas/perfil';
-import Configuracoes from './paginas/configuracoes';
-
+import Home from "./pages/Home/Home";
+import Postagem from "./pages/Postagem/Postagem";
+import SplashPage from "./pages/Splash/SplashPage";
+import LoginPage from "./pages/Login/LoginPage";
+import Cadastro from "./pages/Cadastro/Cadastro";
+import Perfil from "./pages/Perfil/Perfil";
+import Hashtag from "./pages/Hashtag/Hashtag";
+import Configuracoes from "./pages/Configuracoes/Configuracoes";
 
 function App() {
-  
   return (
-    //reinderizando por rotas, cada tela é uma rota no sistema
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<SplashPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<Cadastro />} />
       <Route path="/postagem" element={<Postagem />} />
-      <Route path="/explorar" element={<Explorar />} />
-      <Route path="/notificacoes" element={<Notificacoes />} />
-      <Route path="/minhaempresa" element={<MinhaEmpresa />} />
-      <Route path="/mensagens" element={<Mensagens />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/perfil" element={<Perfil />} />
+      <Route path="/hashtag/:hashtag" element={<Hashtag />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
     </Routes>
-   
-  )
-
+  );
 }
 
 export default App;
