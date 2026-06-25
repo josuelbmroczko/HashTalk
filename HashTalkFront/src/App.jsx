@@ -13,6 +13,17 @@ import Configuracoes from "./pages/Configuracoes/Configuracoes";
 function App() {
 
   return (
+     <Routes>
+      <Route path="/" element={<SplashPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<Cadastro />} />
+      <Route path="/postagem" element={<Postagem />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/perfil" element={<Perfil />} />
+      <Route path="/hashtag/:hashtag" element={<Hashtag />} />
+      <Route path="/configuracoes" element={<Configuracoes />} />
+    </Routes>
+  );
     <>
       <section id="center">
         <div className="hero">
