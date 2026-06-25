@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Cadastro.css";
-import logoHashTalk from "../../assets/LogoHashTalk.jpeg";
+import logoHashTalk from "../../assets/logo.jpeg";
 
 function Cadastro() {
+  const navigate = useNavigate();
   const [nomeEmpresa, setNomeEmpresa] = useState("");
   const [nomeResponsavel, setNomeResponsavel] = useState("");
   const [cargo, setCargo] = useState("");
@@ -14,18 +16,17 @@ function Cadastro() {
     event.preventDefault();
 
     const dadosCadastro = {
-      nomecompleto: nomeResponsavel,
-      username: emailCorporativo,
-      email: emailCorporativo,
+      nomeEmpresa,
+      nomeFuncionario: nomeResponsavel,
+      cargoFuncionario: cargo,
+      emailInstitucional: emailCorporativo,
       senha: senha,
-      role: "EMPRESA",
-      cargo_responsavel: cargo,
-      nome_empresa: nomeEmpresa
+      role: "EMPRESA"
     };
 
     try {
       const resposta = await fetch(
-        "http://localhost:3000/api/usuarios/cadastro",
+        "http://localhost:3000/api/auth/register",
         {
           method: "POST",
           headers: {
@@ -52,6 +53,7 @@ function Cadastro() {
       setSenha("");
 
       console.log(resultado);
+      navigate("/login");
     } catch (error) {
       console.error("Erro ao conectar com o servidor:", error);
       setMensagem("Erro ao conectar com o servidor.");
@@ -169,7 +171,7 @@ function Cadastro() {
           )}
 
           <p className="login-text">
-            Já tem uma conta? <a href="#">Entrar</a>
+            Ja tem uma conta? <button type="button" onClick={() => navigate("/login")}>Entrar</button>
           </p>
         </section>
       </section>
