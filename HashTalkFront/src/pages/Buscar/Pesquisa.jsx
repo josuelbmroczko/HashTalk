@@ -1,5 +1,5 @@
-import BarraPesquisa from "../components/BarraPesquisa";
-import HistoricoPes from "../components/HistoricoPes";
+import BarraPesquisa from "../../components/BarraPesquisa";
+import HistoricoPes from "../../components/HistoricoPes";
 import "./Pesquisa.css";
 
 function Pesquisa(){
