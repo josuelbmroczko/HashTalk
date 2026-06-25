@@ -7,7 +7,7 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchPosts = async () => {
+        const fetchTodosPosts = async () => {
             try {
                 const token = localStorage.getItem('token');
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts`, {
@@ -16,23 +16,23 @@ export default function Home() {
                     }
                 });
                 const data = await response.json();
+
                 if (response.ok) {
-                    setPosts(data.posts || []);
+                    setPosts(Array.isArray(data.posts) ? data.posts : []);
                 } else {
                     console.error("Erro ao buscar posts:", data.error);
                 }
             } catch (error) {
-                console.error("Erro na requisição:", error);
+                console.error("Erro na requisicao:", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchPosts();//chamando a função na primeira vez
+        fetchTodosPosts();
+        const intervalo = setInterval(fetchTodosPosts, 5000);
 
-        const intervalo = setInterval(fetchPosts, 5000);//chama a cada 5 segundos
-
-        return () => clearInterval(intervalo)//evita o memory leak para quando o usuário sair da pagina
+        return () => clearInterval(intervalo);
     }, []);
 
     return (
@@ -41,12 +41,11 @@ export default function Home() {
 
             <div className="content-wrapper">
                 <main className="principal">
-
                     <header className="main-header">
-                        <h2>Para você</h2>
+                        <h2>Todos os posts</h2>
                         <div className="tabs">
                             <span className="tab active">Recentes</span>
-                            <span className="tab">Seguindo</span>
+                            <span className="tab">Todas as contas</span>
                         </div>
                     </header>
 
@@ -54,26 +53,31 @@ export default function Home() {
                         {loading ? (
                             <p>Carregando...</p>
                         ) : posts.length > 0 ? (
-                            posts.map(post => (
-                                <div className="post" key={post.id}>
-                                    <strong>{post.usuario?.nome_empresa || post.usuario?.nomecompleto || "Usuário"}</strong>
+                            posts.map((post) => (
+                                <article className="post" key={post.id}>
+                                    <strong>{post.usuario?.nome_empresa || post.usuario?.nomecompleto || "Usuario"}</strong>
+
+                                    {post.usuario?.username && (
+                                        <span className="post-autor">@{post.usuario.username}</span>
+                                    )}
+
                                     <p>{post.content}</p>
+
                                     {post.hashtags && post.hashtags.length > 0 && (
-                                        <p style={{ color: '#007bff' }}>
+                                        <p className="post-hashtags">
                                             {post.hashtags.map((tag, idx) => (
-                                                <Link to={`/hashtag/${tag.replace('#', '')}`} key={idx} style={{ marginRight: '5px', color: '#007bff', textDecoration: 'none' }}>
+                                                <Link to={`/hashtag/${tag.replace('#', '')}`} key={idx}>
                                                     {tag}
                                                 </Link>
                                             ))}
                                         </p>
                                     )}
-                                </div>
+                                </article>
                             ))
                         ) : (
                             <p>Nenhum post encontrado.</p>
                         )}
                     </section>
-
                 </main>
             </div>
         </div>
