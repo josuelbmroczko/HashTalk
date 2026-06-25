@@ -18,6 +18,7 @@
   top: 0;
   font-family: sans-serif;
   transition: transform 0.3s ease-in-out;
+  z-index: 999;
 }
 
 /* Logo */
@@ -116,6 +117,9 @@
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .hamburger-btn:hover {
@@ -135,6 +139,7 @@
   cursor: pointer;
   z-index: 1001;
   padding: 5px;
+  line-height: 1;
 }
 
 /* Overlay para fechar o menu ao clicar fora */
@@ -182,7 +187,11 @@
 @media screen and (max-width: 1024px) {
     /* com hamburguer */
   .hamburger-btn {
-    display: block;
+    display: flex;
+  }
+
+  .hamburger-btn[aria-expanded="true"] {
+    display: none;
   }
 
   .menu-overlay.active {
@@ -199,6 +208,7 @@
     width: 300px;
     min-width: 300px;
     height: 100vh;
+    overflow-y: auto;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     border-right: 1px solid #e2e8f0;
   }
@@ -206,16 +216,18 @@
   /*estado aberto */
   .lateralMenu.menu-open {
     transform: translateX(0);
-    animation: slideIn 0.3s ease;
+    animation: slideIn 0.4s ease;
   }
 
   /* estado fechando */
   .lateralMenu.menu-closing {
-    animation: slideOut 0.3s ease;
+    animation: slideOut 0.4s ease;
   }
 
   .close-menu-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .lateralMenu .btn-post {
