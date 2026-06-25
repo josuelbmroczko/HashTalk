@@ -5,6 +5,7 @@ import logoHashTalk from "../../assets/logo.jpeg";
 
 function Cadastro() {
   const navigate = useNavigate();
+
   const [nomeEmpresa, setNomeEmpresa] = useState("");
   const [nomeResponsavel, setNomeResponsavel] = useState("");
   const [cargo, setCargo] = useState("");
@@ -19,26 +20,38 @@ function Cadastro() {
     setErrorMsg("");
     setSuccessMsg("");
 
+    if (!nomeEmpresa || !nomeResponsavel || !cargo || !emailCorporativo || !senha) {
+      setErrorMsg("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    if (senha.length < 8) {
+      setErrorMsg("A senha precisa ter pelo menos 8 caracteres.");
+      return;
+    }
+
+    if (!emailCorporativo.includes("@")) {
+      setErrorMsg("Insira um e-mail válido.");
+      return;
+    }
+
     const dadosCadastro = {
       nomeEmpresa,
       nomeFuncionario: nomeResponsavel,
       cargoFuncionario: cargo,
       emailInstitucional: emailCorporativo,
-      senha: senha,
+      senha,
       role: "EMPRESA"
     };
 
     try {
-      const resposta = await fetch(
-        "http://localhost:3000/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(dadosCadastro)
-        }
-      );
+      const resposta = await fetch("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dadosCadastro)
+      });
 
       const resultado = await resposta.json();
 
@@ -49,15 +62,15 @@ function Cadastro() {
 
       setSuccessMsg("Empresa cadastrada com sucesso!");
 
-      // Limpa os campos após o cadastro
       setNomeEmpresa("");
       setNomeResponsavel("");
       setCargo("");
       setEmailCorporativo("");
       setSenha("");
 
-      console.log(resultado);
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
     } catch (error) {
       console.error("Erro ao conectar com o servidor:", error);
       setErrorMsg("Erro ao conectar com o servidor.");
@@ -74,9 +87,7 @@ function Cadastro() {
             className="logo-cadastro"
           />
 
-          <p>
-            Rápido e fácil! Sua empresa pronta em minutos.
-          </p>
+          <p>Rápido e fácil! Sua empresa pronta em minutos.</p>
         </aside>
 
         <section className="cadastro-content">
@@ -89,10 +100,7 @@ function Cadastro() {
           </div>
 
           <h1>Criar conta</h1>
-
-          <p className="subtitle">
-            É rápido e fácil
-          </p>
+          <p className="subtitle">É rápido e fácil</p>
 
           <form className="cadastro-form" onSubmit={handleSubmit}>
             <div>
@@ -101,9 +109,7 @@ function Cadastro() {
                 type="text"
                 placeholder="Ex: Tech Solutions Ltda."
                 value={nomeEmpresa}
-                onChange={(event) =>
-                  setNomeEmpresa(event.target.value)
-                }
+                onChange={(event) => setNomeEmpresa(event.target.value)}
                 required
               />
             </div>
@@ -115,9 +121,7 @@ function Cadastro() {
                   type="text"
                   placeholder="Nome completo"
                   value={nomeResponsavel}
-                  onChange={(event) =>
-                    setNomeResponsavel(event.target.value)
-                  }
+                  onChange={(event) => setNomeResponsavel(event.target.value)}
                   required
                 />
               </div>
@@ -128,9 +132,7 @@ function Cadastro() {
                   type="text"
                   placeholder="Ex: CEO, Gerente..."
                   value={cargo}
-                  onChange={(event) =>
-                    setCargo(event.target.value)
-                  }
+                  onChange={(event) => setCargo(event.target.value)}
                   required
                 />
               </div>
@@ -142,9 +144,7 @@ function Cadastro() {
                 type="email"
                 placeholder="responsavel@empresa.com"
                 value={emailCorporativo}
-                onChange={(event) =>
-                  setEmailCorporativo(event.target.value)
-                }
+                onChange={(event) => setEmailCorporativo(event.target.value)}
                 required
               />
             </div>
@@ -155,17 +155,13 @@ function Cadastro() {
                 type="password"
                 placeholder="Mín. 8 caracteres"
                 value={senha}
-                onChange={(event) =>
-                  setSenha(event.target.value)
-                }
+                onChange={(event) => setSenha(event.target.value)}
                 minLength={8}
                 required
               />
             </div>
 
-            <button type="submit">
-              Cadastrar
-            </button>
+            <button type="submit">Cadastrar</button>
           </form>
 
           {errorMsg && (
@@ -181,7 +177,10 @@ function Cadastro() {
           )}
 
           <p className="login-text">
-            Ja tem uma conta? <button type="button" onClick={() => navigate("/login")}>Entrar</button>
+            Já tem uma conta?{" "}
+            <button type="button" onClick={() => navigate("/login")}>
+              Entrar
+            </button>
           </p>
         </section>
       </section>

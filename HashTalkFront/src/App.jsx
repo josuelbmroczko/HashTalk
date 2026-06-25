@@ -16,12 +16,10 @@ import Configuracoes from './pages/Configuracoes/Configuracoes';
 
 
 function App() {
-  
   return (
-    // renderizando por rotas, cada tela é uma rota no sistema
     <Routes>
       <Route path="/" element={<SplashPage />} />
-      <Route path='/login' element={<LoginPage/>} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<Cadastro />} />
       <Route path="/postagem" element={<Postagem />} />
       <Route path="/home" element={<Home />} />
@@ -31,7 +29,7 @@ function App() {
       {/* Adicione a linha abaixo para registrar a rota */}
       <Route path="/configuracoes" element={<Configuracoes />} />
     </Routes>
-  )
+  );
 }
 
 export default App;
