@@ -1,4 +1,3 @@
-/* --- RESET GLOBAL CRUCIAL --- */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,12 +5,12 @@
 }
 
 body {
-  background-color: #F8FAFC;
+  background-color: #f8fafc;
   font-family: sans-serif;
   overflow-x: hidden;
 }
 
-/* --- CONTAINER MESTRE --- */
+/* CONTAINER MESTRE */
 .app-container {
   display: flex;
   flex-direction: row;
@@ -19,99 +18,14 @@ body {
   min-height: 100vh;
 }
 
-/* --- MENU LATERAL --- */
-.lateralMenu {
-  width: 275px;
-  min-width: 275px;
-  height: 100vh;
-  padding: 20px;
-  border-right: 1px solid #e2e8f0;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  position: sticky;
-  top: 0;
-}
-
-.secaoLateral {
-  width: 275px;
-  min-width: 275px;
-  height: 100vh;
-  padding: 20px;
-  border-right: 1px solid #e2e8f0;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  position: sticky;
-  top: 0;
-}
-
-.img-logo {
-  display: flex;
-  height: 50px;
-  width: 50px;
-  margin-bottom: 20px;
-}
-
-.img-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-ul {
-  list-style-type: none;
-  width: 100%;
-}
-
-ul li a {
-  display: flex;
-  align-items: center;
-  padding: 11px;
-  color: #1E293B;
-  gap: 12px;
-  text-decoration: none;
-  border-radius: 8px;
-}
-
-li a:hover {
-  background-color: #E0F7FA;
-  color: #0891B2;
-}
-
-.icone {
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-}
-
-.btn-post {
-  background-color: #ffffff;
-  padding: 10px;
-  width: 100%;
-  max-width: 200px;
-  border-radius: 9999px;
-  border: 1px solid #1E293B;
-  margin-top: auto;
-  cursor: pointer;
-}
-
-.btn-post a {
-  text-decoration: none;
-  font-weight: bold;
-  color: #1E293B;
-  display: block;
-  text-align: center;
-}
-
-/* --- CONTAINER DA DIREITA --- */
+/* CONTAINER DA DIREITA */
 .content-wrapper {
   flex: 1;
   display: flex;
   flex-direction: row;
 }
 
-/* --- FEED PRINCIPAL --- */
+/* FEED PRINCIPAL */
 .principal {
   width: 100%;
   border-right: 1px solid #e2e8f0;
@@ -121,7 +35,6 @@ li a:hover {
   min-height: 100vh;
 }
 
-/* --- CABEÃ‡ALHO DO FEED --- */
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -143,6 +56,7 @@ li a:hover {
   padding-bottom: 15px;
 }
 
+/* POSTS */
 .post {
   border: solid black 0.5px;
   border-radius: 12px;
@@ -237,7 +151,7 @@ li a:hover {
 .empresa-info strong {
   display: block;
   font-size: 15px;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .empresa-handle {
@@ -251,7 +165,7 @@ li a:hover {
   margin-bottom: 8px;
 }
 
-/* --- HASHTAGS --- */
+/* HASHTAGS */
 .hashtags-lista {
   display: flex;
   flex-wrap: wrap;
@@ -267,7 +181,7 @@ li a:hover {
   cursor: pointer;
 }
 
-/* --- VISIBILIDADE --- */
+/* VISIBILIDADE */
 .visibilidade-opcoes {
   display: flex;
   gap: 10px;
@@ -290,7 +204,6 @@ li a:hover {
   border-color: #00a8b5;
 }
 
-/* --- BOTÃ•ES DE AÃ‡ÃƒO --- */
 .acoes-post {
   display: flex;
   gap: 12px;
@@ -303,7 +216,7 @@ li a:hover {
   border: 1.5px solid #cbd5e1;
   background-color: #ffffff;
   font-size: 14px;
-  color: #1E293B;
+  color: #1e293b;
   cursor: pointer;
 }
 
@@ -315,7 +228,7 @@ li a:hover {
   padding: 10px 28px;
   border-radius: 9999px;
   border: none;
-  background-color: #1E293B;
+  background-color: #1e293b;
   color: #ffffff;
   font-size: 14px;
   font-weight: 600;
