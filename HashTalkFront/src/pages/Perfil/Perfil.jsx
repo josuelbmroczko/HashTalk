@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import MenuLateral from "../../componentes/menuLateral";
+import { useEffect, useState } from "react";
+import MenuLateral from "../../componentes/MenuLateral";
 import "./Perfil.css";
 
 function Perfil() {
@@ -8,13 +8,18 @@ function Perfil() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const carregarPerfil = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
+
         const response = await fetch("http://localhost:3000/api/auth/me", {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
+
         const data = await response.json();
+
         if (response.ok) {
           setUserInfo(data.usuario);
         }
@@ -22,53 +27,74 @@ function Perfil() {
         console.error("Erro ao buscar dados do usuário:", error);
       }
     };
-    
-    fetchUserData();
 
-    const fetchMyPosts = async () => {
+    const carregarPosts = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
+
         const response = await fetch("http://localhost:3000/api/posts/me", {
           headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         });
+
         const data = await response.json();
+
         if (response.ok) {
           setPosts(data.posts || []);
-        } else {
-          console.error("Erro ao buscar meus posts:", data.error);
         }
       } catch (error) {
-        console.error("Erro na requisição:", error);
+        console.error("Erro ao buscar meus posts:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMyPosts();
+    carregarPerfil();
+    carregarPosts();
   }, []);
+
+  const nomePerfil =
+    userInfo?.nomeEmpresa ||
+    userInfo?.nomeFuncionario ||
+    userInfo?.nomecompleto ||
+    "Usuário";
+
+  const cargoPerfil =
+    userInfo?.cargoFuncionario ||
+    userInfo?.cargo_responsavel ||
+    "Cargo";
+
+  const usuarioPerfil = nomePerfil
+    .toLowerCase()
+    .replace(/\s/g, "");
+
+  const iniciais = nomePerfil.substring(0, 2).toUpperCase();
 
   return (
     <div className="app-container">
       <MenuLateral />
+
       <div className="content-wrapper">
-        <main className="perfil-page" style={{ width: '100%', margin: '0' }}>
-          <section className="perfil-card" style={{ display: 'block', maxWidth: '800px', margin: '0 auto' }}>
-            <section className="perfil-conteudo" style={{ borderLeft: 'none' }}>
+        <main className="perfil-page">
+          <section className="perfil-card">
+            <section className="perfil-conteudo">
               <div className="perfil-capa"></div>
 
               <div className="perfil-info">
-                <div className="avatar">{userInfo?.nomeEmpresa?.substring(0, 2) || userInfo?.nomeFuncionario?.substring(0, 2) || 'US'}</div>
-
-                <button className="editar-perfil">Editar perfil</button>
-
-                <h1>{userInfo?.nomeEmpresa || userInfo?.nomeFuncionario || "Usuário"}</h1>
-                <p className="user">@{userInfo?.nomeEmpresa?.toLowerCase().replace(/\s/g, '') || userInfo?.nomeFuncionario?.toLowerCase().replace(/\s/g, '') || 'usuario'} · {userInfo?.cargoFuncionario || 'Cargo'}</p>
-
-                <div className="local">
-                  Brasil · hashtalk.app/perfil
+                <div className="avatar">
+                  {iniciais}
                 </div>
+
+                <button className="editar-perfil">
+                  Editar perfil
+                </button>
+
+                <h1>{nomePerfil}</h1>
+
+                <p className="user">
+                  @{usuarioPerfil} · {cargoPerfil}
+                </p>
 
                 <p className="bio">
                   Apaixonada por tecnologia, design e inovação.
@@ -77,16 +103,15 @@ function Perfil() {
 
               <div className="perfil-numeros">
                 <div>
-                  <strong>{posts.length}</strong>
-                  <span>Posts</span>
+                  <strong>{posts.length}</strong> <span>Posts</span>
                 </div>
+
                 <div>
-                  <strong>842</strong>
-                  <span>Seguidores</span>
+                  <strong>842</strong> <span>Seguidores</span>
                 </div>
+
                 <div>
-                  <strong>356</strong>
-                  <span>Seguindo</span>
+                  <strong>356</strong> <span>Seguindo</span>
                 </div>
               </div>
 
@@ -97,30 +122,27 @@ function Perfil() {
               </div>
 
               {loading ? (
-                <p style={{ padding: '20px' }}>Carregando posts...</p>
+                <p style={{ padding: "20px" }}>Carregando posts...</p>
               ) : posts.length > 0 ? (
-                posts.map(post => (
+                posts.map((post) => (
                   <article className="post-card" key={post.id}>
                     <p>{post.content}</p>
-
-                    {post.hashtags && post.hashtags.length > 0 && (
-                      <div className="hashtags">
-                        {post.hashtags.map((tag, idx) => (
-                          <span key={idx} style={{ marginRight: '5px', color: '#007bff' }}>{tag}</span>
-                        ))}
-                      </div>
-                    )}
 
                     <div className="post-acoes">
                       <span>♡ 0</span>
                       <span>💬 0</span>
-                      <span>↗ 0</span>
-                      <small>{new Date(post.created_at).toLocaleDateString()}</small>
+                      <small>
+                        {post.created_at
+                          ? new Date(post.created_at).toLocaleDateString()
+                          : ""}
+                      </small>
                     </div>
                   </article>
                 ))
               ) : (
-                <p style={{ padding: '20px' }}>Nenhum post encontrado.</p>
+                <p style={{ padding: "20px" }}>
+                  Nenhum post encontrado.
+                </p>
               )}
             </section>
           </section>
