@@ -12,4 +12,7 @@ router.get('/', usuarioController.listarUsuarios);
 router.get('/funcionarios', usuarioController.listarFuncionarios);
 router.get('/empresas', usuarioController.listarEmpresas);
 
+// Rota para atualizar dados do usuário
+router.put('/:id', usuarioController.atualizarUsuario);
+
 module.exports = router;

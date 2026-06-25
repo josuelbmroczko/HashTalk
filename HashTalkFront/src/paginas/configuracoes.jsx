@@ -1,7 +1,14 @@
 import MenuLateral from '../componentes/menuLateral';
 import { useState } from 'react';
 
+// URL base do backend
+const API_URL = 'http://localhost:3000';
+
 export default function Configuracoes() {
+  // Por enquanto usamos ID fixo 1 para teste
+  // Quando o grupo implementar login, trocar pelo ID do usuário logado
+  const USUARIO_ID = 1;
+
   const [nomeUsuario, setNomeUsuario] = useState('');
   const [email, setEmail] = useState('');
   const [senhaAtual, setSenhaAtual] = useState('');
@@ -11,13 +18,48 @@ export default function Configuracoes() {
   const [perfilPublico, setPerfilPublico] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState('');
+  const [erro, setErro] = useState('');
 
   const handleSalvar = async () => {
     setSalvando(true);
     setMensagem('');
-    await new Promise((r) => setTimeout(r, 800));
-    setMensagem('Configurações salvas com sucesso!');
-    setSalvando(false);
+    setErro('');
+
+    // Monta apenas os campos que foram preenchidos
+    const dadosAtualizar = {};
+    if (nomeUsuario.trim()) dadosAtualizar.username = nomeUsuario.trim();
+    if (email.trim()) dadosAtualizar.email = email.trim();
+    if (novaSenha.trim()) dadosAtualizar.senha = novaSenha.trim();
+
+    if (Object.keys(dadosAtualizar).length === 0) {
+      setErro('Preencha ao menos um campo para salvar.');
+      setSalvando(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/usuarios/${USUARIO_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dadosAtualizar),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErro(data.error || 'Erro ao salvar configurações.');
+      } else {
+        setMensagem('Configurações salvas com sucesso!');
+        setNomeUsuario('');
+        setEmail('');
+        setSenhaAtual('');
+        setNovaSenha('');
+      }
+    } catch (err) {
+      setErro('Não foi possível conectar ao servidor. Verifique se o backend está rodando.');
+    } finally {
+      setSalvando(false);
+    }
   };
 
   return (
@@ -33,6 +75,7 @@ export default function Configuracoes() {
 
           <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
+            {/* Mensagem de sucesso */}
             {mensagem && (
               <div style={{
                 background: '#e0f7fa', border: '1px solid #00a8b5',
@@ -43,6 +86,17 @@ export default function Configuracoes() {
               </div>
             )}
 
+            {/* Mensagem de erro */}
+            {erro && (
+              <div style={{
+                background: '#fff1f2', border: '1px solid #fca5a5',
+                borderRadius: '8px', padding: '12px 16px',
+                color: '#dc2626', fontWeight: 600, fontSize: '14px'
+              }}>
+                ✕ {erro}
+              </div>
+            )}
+
             {/* Informações da Conta */}
             <section style={estiloSecao}>
               <h3 style={estiloTituloSecao}>Informações da Conta</h3>
@@ -50,7 +104,7 @@ export default function Configuracoes() {
                 <label style={estiloLabel}>Nome de usuário</label>
                 <input
                   type="text"
-                  placeholder="Seu nome de usuário"
+                  placeholder="Novo nome de usuário"
                   value={nomeUsuario}
                   onChange={(e) => setNomeUsuario(e.target.value)}
                   style={estiloInput}
@@ -60,7 +114,7 @@ export default function Configuracoes() {
                 <label style={estiloLabel}>E-mail</label>
                 <input
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder="Novo e-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   style={estiloInput}

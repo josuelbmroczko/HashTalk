@@ -129,9 +129,51 @@ const listarEmpresas = async (req, res) => {
     }
 };
 
+const atualizarUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nomecompleto, username, email, senha } = req.body;
+
+        if (!nomecompleto && !username && !email && !senha) {
+            return res.status(400).json({ error: 'Informe ao menos um campo para atualizar.' });
+        }
+
+        const dadosAtualizar = {};
+        if (nomecompleto) dadosAtualizar.nomecompleto = nomecompleto;
+        if (username) dadosAtualizar.username = username;
+        if (email) dadosAtualizar.email = email;
+        if (senha) dadosAtualizar.senha = senha;
+
+        const usuario = await prisma.usuario.update({
+            where: { id: parseInt(id) },
+            data: dadosAtualizar,
+            select: {
+                id: true,
+                nomecompleto: true,
+                username: true,
+                email: true,
+                role: true,
+                criado_em: true
+            }
+        });
+
+        res.json({ message: 'Usuário atualizado com sucesso!', usuario });
+    } catch (error) {
+        if (error.code === 'P2025') {
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
+        if (error.code === 'P2002') {
+            return res.status(400).json({ error: 'Username ou email já estão em uso.' });
+        }
+        console.error('Erro ao atualizar usuário:', error);
+        res.status(500).json({ error: 'Erro interno ao atualizar usuário.' });
+    }
+};
+
 module.exports = {
     cadastrarUsuario,
     listarUsuarios,
     listarFuncionarios,
-    listarEmpresas
+    listarEmpresas,
+    atualizarUsuario
 };
