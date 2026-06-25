@@ -3,6 +3,7 @@ import { IoIosBusiness } from 'react-icons/io';
 import { MdExplore } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.jpeg';
+import './MenuLateral.css';
 
 export default function MenuLateral() {
     const navigate = useNavigate();
