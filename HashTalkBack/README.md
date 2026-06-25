@@ -87,10 +87,10 @@ Para facilitar o uso por qualquer pessoa da equipe, o projeto foi totalmente aut
     "username": "joaosilva",
     "email": "joao.silva@email.com",
     "senha": "senha_segura_123",
-    "role": "FUNCIONARIO",
-    "empresa_id": 1
+    "role": "FUNCIONARIO"
   }
   ```
+*(O `id` do usuario e gerado automaticamente. Envie `empresa_id` somente se quiser vincular o funcionario a uma empresa que ja existe.)*
 
 ### 10. Cadastro de Usuário (Empresa)
 - **Método:** `POST`

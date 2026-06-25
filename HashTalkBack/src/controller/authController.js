@@ -12,38 +12,33 @@ class AuthController {
                 nomeFuncionario,
                 cargoFuncionario,
                 emailInstitucional,
-                senha
+                senha,
+                role
             } = req.body;
 
-            if (!empresaId) {
-                return res.status(400).json({
-                    error: 'ID da empresa é obrigatório'
-                });
-            }
-
             if (!nomeEmpresa) {
-                return res.status(400).json({ error: 'Nome da empresa é obrigatório' });
+                return res.status(400).json({ error: 'Nome da empresa e obrigatorio' });
             }
 
             if (!nomeFuncionario) {
-                return res.status(400).json({ error: 'Seu nome completo é obrigatório' });
+                return res.status(400).json({ error: 'Seu nome completo e obrigatorio' });
             }
 
             if (!cargoFuncionario) {
-                return res.status(400).json({ error: 'O cargo que você presta na empresa é obrigatório' });
+                return res.status(400).json({ error: 'O cargo que voce presta na empresa e obrigatorio' });
             }
 
             if (!emailInstitucional) {
-                return res.status(400).json({ error: 'O E-mail instituicional é obrigatório' });
+                return res.status(400).json({ error: 'O email institucional e obrigatorio' });
             }
 
             if (!senha || senha.length < 6) {
-                return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres' });
+                return res.status(400).json({ error: 'A senha deve ter no minimo 6 caracteres' });
             }
 
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(emailInstitucional)) {
-                return res.status(400).json({ error: 'Email institucional inválido' });
+                return res.status(400).json({ error: 'Email institucional invalido' });
             }
 
             const newUser = await userService.createUser({
@@ -52,20 +47,28 @@ class AuthController {
                 nomeFuncionario,
                 cargoFuncionario,
                 emailInstitucional,
-                senha
+                senha,
+                role
             });
 
             res.status(201).json({
-                message: 'Usuário criado com sucesso',
+                message: 'Usuario criado com sucesso',
                 usuario: newUser
             });
-
         } catch (error) {
             console.error('Erro no registro:', error);
+
             if (error.message.includes('Email institucional')) {
                 return res.status(409).json({ error: error.message });
             }
-            res.status(500).json({ error: 'Erro ao criar usuário' });
+
+            if (error.code === 'P2003') {
+                return res.status(400).json({
+                    error: 'A empresa informada nao existe. Remova empresaId para criar uma nova empresa automaticamente.'
+                });
+            }
+
+            res.status(500).json({ error: 'Erro ao criar usuario' });
         }
     }
 
@@ -103,32 +106,29 @@ class AuthController {
         }
     }
 
-    // Verificar token
     async verifyToken(req, res) {
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
             if (!token) {
-                return res.status(401).json({ error: 'Token não fornecido' });
+                return res.status(401).json({ error: 'Token nao fornecido' });
             }
 
             const decoded = jwt.verify(token, JWT_SECRET);
             const user = await userService.findUserById(decoded.id);
 
             if (!user) {
-                return res.status(401).json({ error: 'Usuário não encontrado' });
+                return res.status(401).json({ error: 'Usuario nao encontrado' });
             }
 
-            const { senha, ...userWithoutPassword } = user;
             res.json({
                 valid: true,
-                usuario: userWithoutPassword
+                usuario: user
             });
-
         } catch (error) {
             res.status(401).json({
                 valid: false,
-                error: 'Token inválido'
+                error: 'Token invalido'
             });
         }
     }
@@ -141,4 +141,3 @@ class AuthController {
 }
 
 module.exports = new AuthController();
-
