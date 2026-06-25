@@ -1,9 +1,8 @@
-//icones para o menu lateral
 import { FaHome, FaBell, FaEnvelope, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { IoIosBusiness } from 'react-icons/io';
 import { MdExplore } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.jpeg'
+import logo from '../assets/logo.jpeg';
 
 export default function MenuLateral() {
     const navigate = useNavigate();
@@ -25,8 +24,8 @@ export default function MenuLateral() {
             navigate('/login');
         }
     };
+
     return (
-        //redirecionando o menu lateral
         <aside className='lateralMenu'>
             <div className="img-logo">
                 <img src={logo} alt="Logo" />
@@ -42,7 +41,7 @@ export default function MenuLateral() {
                     </li>
                     <li>
                         <a href='/explorar'>
-                            < MdExplore className="icone"/>
+                            <MdExplore className="icone"/>
                             <span>Explorar</span>
                         </a>
                     </li>
@@ -83,18 +82,13 @@ export default function MenuLateral() {
                         </a>
                     </li>
                 </ul>
-
             </nav>
 
             <button className="btn-post">
                 <a href='/postagem'> 
-                {/* chamada da pagina de postagem */}
                     <span>+ Novo Post</span>
                 </a>
-                
             </button>
         </aside>
-
-
     );
 }
