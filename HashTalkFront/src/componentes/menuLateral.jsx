@@ -2,7 +2,8 @@ import { FaHome, FaBell, FaEnvelope, FaUser, FaCog, FaSignOutAlt } from 'react-i
 import { IoIosBusiness } from 'react-icons/io';
 import { MdExplore } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.jpeg';
+import logo from '../assets/logo.jpeg'
+import './App.css';
 
 export default function MenuLateral() {
     const navigate = useNavigate();
@@ -41,6 +42,7 @@ export default function MenuLateral() {
                     </li>
                     <li>
                         <a href='/explorar'>
+                            <MdExplore className="icone"/>
                             <MdExplore className="icone"/>
                             <span>Explorar</span>
                         </a>
