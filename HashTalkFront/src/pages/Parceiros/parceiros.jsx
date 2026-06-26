@@ -77,25 +77,9 @@ export default function Parceiros() {
       }
 
       const usuariosData = await usuariosRes.json();
-      let relacionamentosData = null;
-
-      try {
-        const relacionamentosRes = await fetch(`${API_URL}/api/usuarios/relacionamentos`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (relacionamentosRes.ok) {
-          relacionamentosData = await relacionamentosRes.json();
-        }
-      } catch (error) {
-        console.warn("Relacionamentos indisponiveis, usando lista de usuarios.", error);
-      }
-
-      const followingFromApi =
-        relacionamentosData?.following || usuariosData.filter((usuario) => usuario.isFollowing);
-      const followersFromApi = relacionamentosData?.followers || [];
-      const suggestionsFromApi =
-        relacionamentosData?.suggestions || usuariosData.filter((usuario) => !usuario.isFollowing);
+      const followingFromApi = usuariosData.filter((usuario) => usuario.isFollowing);
+      const followersFromApi = [];
+      const suggestionsFromApi = usuariosData.filter((usuario) => !usuario.isFollowing);
       const followingIds = new Set(followingFromApi.map((usuario) => usuario.id));
 
       setUsuarios(usuariosData.map((usuario) => withAvatarStyle({
@@ -110,9 +94,9 @@ export default function Parceiros() {
           .map((usuario) => withAvatarStyle({ ...usuario, isFollowing: false }))
       );
       setCounts({
-        following: relacionamentosData?.counts?.following ?? followingFromApi.length,
-        followers: relacionamentosData?.counts?.followers ?? followersFromApi.length,
-        suggestions: relacionamentosData?.counts?.suggestions ?? suggestionsFromApi.length,
+        following: followingFromApi.length,
+        followers: followersFromApi.length,
+        suggestions: suggestionsFromApi.length,
       });
     } catch (error) {
       console.error("Erro ao carregar parceiros:", error);
