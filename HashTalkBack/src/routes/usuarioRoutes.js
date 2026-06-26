@@ -10,6 +10,7 @@ router.use(authMiddleware.verifyUserExists);
 router.get('/', usuarioController.listarUsuarios);
 router.get('/colegas', usuarioController.listarColegas);
 router.get('/search', usuarioController.buscarUsuarios);
+router.get('/relacionamentos', usuarioController.listarRelacionamentos);
 router.get('/:id', usuarioController.getPerfilUsuario);
 router.post('/:id/follow', usuarioController.toggleFollow);
 

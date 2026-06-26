@@ -67,6 +67,82 @@ const listarUsuarios = async (req, res) => {
     }
 };
 
+const listarRelacionamentos = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user.id);
+        const selectUsuario = {
+            id: true,
+            nomecompleto: true,
+            username: true,
+            email: true,
+            role: true,
+            cargo_responsavel: true,
+            nome_empresa: true,
+            avatar_url: true,
+            _count: {
+                select: {
+                    seguidores: true,
+                    seguindo: true,
+                    posts: true
+                }
+            }
+        };
+
+        const [followingRows, followerRows] = await Promise.all([
+            prisma.follow.findMany({
+                where: { followerId: loggedUserId },
+                orderBy: { created_at: 'desc' },
+                include: { followed: { select: selectUsuario } }
+            }),
+            prisma.follow.findMany({
+                where: { followedId: loggedUserId },
+                orderBy: { created_at: 'desc' },
+                include: { follower: { select: selectUsuario } }
+            })
+        ]);
+
+        const followingIds = new Set(followingRows.map((row) => row.followedId));
+
+        const suggestions = await prisma.usuario.findMany({
+            where: {
+                AND: [
+                    { id: { not: loggedUserId } },
+                    { id: { notIn: Array.from(followingIds) } }
+                ]
+            },
+            orderBy: { criado_em: 'desc' },
+            take: 8,
+            select: selectUsuario
+        });
+
+        const normalize = (usuario, isFollowing = false) => {
+            const { _count, ...dadosUsuario } = usuario;
+            return {
+                ...dadosUsuario,
+                isFollowing,
+                totalSeguidores: _count.seguidores,
+                totalSeguindo: _count.seguindo,
+                totalPosts: _count.posts
+            };
+        };
+
+        res.json({
+            following: followingRows.map((row) => normalize(row.followed, true)),
+            followers: followerRows.map((row) => normalize(row.follower, followingIds.has(row.followerId))),
+            suggestions: suggestions.map((usuario) => normalize(usuario, false)),
+            counts: {
+                following: followingRows.length,
+                followers: followerRows.length,
+                mutual: followerRows.filter((row) => followingIds.has(row.followerId)).length,
+                suggestions: suggestions.length
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao listar relacionamentos:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar parceiros.' });
+    }
+};
+
 const listarFuncionarios = async (req, res) => {
     try {
         const funcionarios = await prisma.usuario.findMany({
@@ -186,7 +262,9 @@ const toggleFollow = async (req, res) => {
             await prisma.follow.delete({
                 where: { id: existingFollow.id }
             });
-            return res.json({ following: false });
+            const totalSeguidores = await prisma.follow.count({ where: { followedId: targetUserId } });
+            const totalSeguindo = await prisma.follow.count({ where: { followerId: loggedUserId } });
+            return res.json({ following: false, totalSeguidores, totalSeguindo });
         } else {
             await prisma.follow.create({
                 data: {
@@ -194,7 +272,9 @@ const toggleFollow = async (req, res) => {
                     followedId: targetUserId
                 }
             });
-            return res.status(201).json({ following: true });
+            const totalSeguidores = await prisma.follow.count({ where: { followedId: targetUserId } });
+            const totalSeguindo = await prisma.follow.count({ where: { followerId: loggedUserId } });
+            return res.status(201).json({ following: true, totalSeguidores, totalSeguindo });
         }
     } catch (error) {
         console.error('Erro ao alternar follow:', error);
@@ -291,6 +371,7 @@ const buscarUsuarios = async (req, res) => {
 module.exports = {
     cadastrarUsuario,
     listarUsuarios,
+    listarRelacionamentos,
     listarFuncionarios,
     listarEmpresas,
     getPerfilUsuario,
