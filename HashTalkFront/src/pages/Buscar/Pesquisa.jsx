@@ -72,7 +72,6 @@ function Pesquisa() {
                 </p>
               </article>
             </div>
-
             <div className="explorar-grid" style={{ marginTop: '16px' }}>
               <section className="explorar-card">
                 <div className="explorar-card-header">
@@ -109,20 +108,20 @@ function Pesquisa() {
                         .toUpperCase();
 
                       return (
-                        <a 
-                          className="trend-item colega-item" 
-                          href={`/perfil/${colega.id}`} 
+                        <a
+                          className="trend-item colega-item"
+                          href={`/perfil/${colega.id}`}
                           key={colega.id}
                           style={{ gridTemplateColumns: '42px 1fr' }}
                         >
-                          <div 
-                            className="avatar" 
-                            style={{ 
-                              width: '36px', 
-                              height: '36px', 
-                              fontSize: '14px', 
-                              display: 'flex', 
-                              alignItems: 'center', 
+                          <div
+                            className="avatar"
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              fontSize: '14px',
+                              display: 'flex',
+                              alignItems: 'center',
                               justifyContent: 'center',
                               borderRadius: '50%',
                               backgroundColor: '#0891B2',
@@ -134,10 +133,10 @@ function Pesquisa() {
                             }}
                           >
                             {colega.avatar_url || colega.avatarUrl ? (
-                              <img 
-                                src={colega.avatar_url || colega.avatarUrl} 
-                                alt={colega.nomecompleto} 
-                                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                              <img
+                                src={colega.avatar_url || colega.avatarUrl}
+                                alt={colega.nomecompleto}
+                                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
                               />
                             ) : (
                               iniciais || "HT"
