@@ -44,6 +44,20 @@ const withAvatarStyle = (usuario) => {
   };
 };
 
+const postFollow = async (usuarioId, token) => {
+  const options = {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  const primary = await fetch(`${API_URL}/api/usuarios/${usuarioId}/follow`, options);
+
+  if (primary.status !== 404) {
+    return primary;
+  }
+
+  return fetch(`${API_URL}/api/usuarios/follow/${usuarioId}`, options);
+};
+
 export default function Parceiros() {
   const navigate = useNavigate();
   const [abaAtiva, setAbaAtiva] = useState(0);
@@ -187,10 +201,7 @@ export default function Parceiros() {
         throw new Error("Voce precisa estar logado para seguir parceiros.");
       }
 
-      const res = await fetch(`${API_URL}/api/usuarios/${usuarioId}/follow`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await postFollow(usuarioId, token);
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
