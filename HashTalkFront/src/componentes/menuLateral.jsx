@@ -21,6 +21,10 @@ const navItems = [
 export default function MenuLateral() {
   const navigate = useNavigate();
   const [menuAberto, setMenuAberto] = useState(false);
+  const [userInfo] = useState(() => {
+    const user = localStorage.getItem("usuario");
+    return user ? JSON.parse(user) : null;
+  });
 
   const fecharMenu = () => setMenuAberto(false);
 
@@ -71,10 +75,14 @@ export default function MenuLateral() {
         </button>
 
         <div className="menu-brand">
-          <img src={logo} alt="HashTalk" />
+          {userInfo?.avatarUrl ? (
+            <img src={userInfo.avatarUrl} alt={userInfo.nomeEmpresa || "User Avatar"} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+          ) : (
+            <img src={logo} alt="HashTalk" />
+          )}
           <div>
-            <strong>HashTalk</strong>
-            <span>Rede B2B</span>
+            <strong>{userInfo?.nomeEmpresa || "HashTalk"}</strong>
+            <span>{userInfo?.cargoFuncionario || "Rede B2B"}</span>
           </div>
         </div>
 

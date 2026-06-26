@@ -93,6 +93,12 @@ export default function Home() {
 
                     <p className="post-content">{post.content}</p>
 
+                    {post.image_url && (
+                      <div className="post-image-container">
+                        <img src={post.image_url} alt="Imagem do post" className="post-image" />
+                      </div>
+                    )}
+
                     {post.hashtags && post.hashtags.length > 0 && (
                       <div className="post-tags" aria-label="Hashtags">
                         {post.hashtags.map((tag, idx) => (

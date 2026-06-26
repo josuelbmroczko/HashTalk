@@ -9,6 +9,73 @@ function Perfil() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Edit Profile States
+  const [modalAberto, setModalAberto] = useState(false);
+  const [editAvatar, setEditAvatar] = useState("");
+  const [editCapa, setEditCapa] = useState("");
+  const [editNome, setEditNome] = useState("");
+  const [editCargo, setEditCargo] = useState("");
+  const [editNomeEmpresa, setEditNomeEmpresa] = useState("");
+
+  const abrirModal = () => {
+    setEditAvatar(userInfo?.avatarUrl || "");
+    setEditCapa(userInfo?.capaUrl || "");
+    setEditNome(userInfo?.nomeFuncionario || userInfo?.nomecompleto || "");
+    setEditCargo(userInfo?.cargoFuncionario || userInfo?.cargo_responsavel || "");
+    setEditNomeEmpresa(userInfo?.nomeEmpresa || userInfo?.nome_empresa || "");
+    setModalAberto(true);
+  };
+
+  const handleAvatarFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setEditAvatar(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCapaFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setEditCapa(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const salvarPerfil = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_URL}/api/auth/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          avatarUrl: editAvatar,
+          capaUrl: editCapa,
+          nomecompleto: editNome,
+          cargoFuncionario: editCargo,
+          nomeEmpresa: editNomeEmpresa
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserInfo(data.usuario);
+        localStorage.setItem("usuario", JSON.stringify(data.usuario));
+        setModalAberto(false);
+      } else {
+        alert("Erro ao atualizar perfil");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao conectar com o servidor");
+    }
+  };
+
   useEffect(() => {
     const carregarPerfil = async () => {
       try {
@@ -79,11 +146,20 @@ function Perfil() {
       <div className="content-wrapper">
         <main className="principal perfil-page">
           <section className="perfil-hero">
-            <div className="perfil-capa" />
+            <div 
+              className="perfil-capa" 
+              style={userInfo?.capaUrl ? { backgroundImage: `url(${userInfo.capaUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+            />
 
             <div className="perfil-info">
-              <div className="avatar">{iniciais || "HT"}</div>
-              <button type="button" className="editar-perfil">Editar perfil</button>
+              <div className="avatar">
+                {userInfo?.avatarUrl ? (
+                  <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  iniciais || "HT"
+                )}
+              </div>
+              <button type="button" className="editar-perfil" onClick={abrirModal}>Editar perfil</button>
 
               <div className="perfil-identidade">
                 <h1>{nomePerfil}</h1>
@@ -126,7 +202,13 @@ function Perfil() {
               posts.map((post) => (
                 <article className="post-card" key={post.id}>
                   <div className="post-card-header">
-                    <div className="avatar post-mini-avatar">{iniciais || "HT"}</div>
+                    <div className="avatar post-mini-avatar">
+                      {userInfo?.avatarUrl ? (
+                        <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                      ) : (
+                        iniciais || "HT"
+                      )}
+                    </div>
                     <div>
                       <strong>{nomePerfil}</strong>
                       <span>@{usuarioPerfil}</span>
@@ -134,6 +216,12 @@ function Perfil() {
                   </div>
 
                   <p>{post.content}</p>
+
+                  {post.image_url && (
+                    <div className="post-image-container">
+                      <img src={post.image_url} alt="Imagem do post" className="post-image" />
+                    </div>
+                  )}
 
                   <div className="post-acoes">
                     <span><FaRegHeart /> 0</span>
@@ -152,6 +240,49 @@ function Perfil() {
           </section>
         </main>
       </div>
+
+      {modalAberto && (
+        <div className="modal-overlay" onClick={() => setModalAberto(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Editar Perfil</h2>
+              <button type="button" className="modal-close" onClick={() => setModalAberto(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Nome Completo / Representante</label>
+                <input type="text" value={editNome} onChange={(e) => setEditNome(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Nome da Empresa</label>
+                <input type="text" value={editNomeEmpresa} onChange={(e) => setEditNomeEmpresa(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Cargo / Responsabilidade</label>
+                <input type="text" value={editCargo} onChange={(e) => setEditCargo(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Foto de Perfil (Avatar)</label>
+                <input type="text" placeholder="URL da foto..." value={editAvatar} onChange={(e) => setEditAvatar(e.target.value)} />
+                <div style={{ marginTop: '8px' }}>
+                  <input type="file" accept="image/*" onChange={handleAvatarFile} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Imagem de Capa</label>
+                <input type="text" placeholder="URL da capa..." value={editCapa} onChange={(e) => setEditCapa(e.target.value)} />
+                <div style={{ marginTop: '8px' }}>
+                  <input type="file" accept="image/*" onChange={handleCapaFile} />
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn-cancelar" onClick={() => setModalAberto(false)}>Cancelar</button>
+              <button type="button" className="btn-salvar" onClick={salvarPerfil}>Salvar Alterações</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

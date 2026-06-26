@@ -14,13 +14,13 @@ router.post('/logout', authMiddleware.verifyToken, authController.logout);
 router.get('/me', 
   authMiddleware.verifyToken,
   authMiddleware.verifyUserExists,
-  authMiddleware.extractUserInfo,
-  (req, res) => {
-    res.json({
-      message: 'Usuário autenticado',
-      usuario: req.userInfo
-    });
-  }
+  authController.getMe
+);
+
+router.put('/me',
+  authMiddleware.verifyToken,
+  authMiddleware.verifyUserExists,
+  authController.updateMe
 );
 
 module.exports = router;

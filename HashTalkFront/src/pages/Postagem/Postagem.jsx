@@ -8,6 +8,7 @@ import './Postagem.css';
 
 export default function Postagem() {
   const [texto, setTexto] = useState('');
+  const [imagemUrl, setImagemUrl] = useState('');
   const [visibilidade, setVisibilidade] = useState('parceiros');
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
@@ -17,6 +18,17 @@ export default function Postagem() {
     return user ? JSON.parse(user) : null;
   });
   const navigate = useNavigate();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagemUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const nomeEmpresa = userInfo?.nomeEmpresa || userInfo?.nomeFuncionario || 'Empresa';
   const cargo = userInfo?.cargoFuncionario || userInfo?.cargo_responsavel || 'Cargo';
@@ -58,11 +70,12 @@ export default function Postagem() {
       const response = await fetch(`${API_URL}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ content: texto }),
+        body: JSON.stringify({ content: texto, image_url: imagemUrl || null }),
       });
 
       if (response.ok) {
         setTexto('');
+        setImagemUrl('');
         await fetchPosts({ silent: true });
       } else {
         const data = await response.json();
@@ -158,6 +171,36 @@ export default function Postagem() {
                 />
               </label>
 
+              <div className="composer-field image-composer-field">
+                <span>Imagem da Publicação</span>
+                <div className="image-inputs">
+                  <input
+                    type="text"
+                    placeholder="Cole a URL de uma imagem..."
+                    value={imagemUrl}
+                    onChange={(e) => setImagemUrl(e.target.value)}
+                    className="image-url-input"
+                  />
+                  <div className="file-upload-wrapper">
+                    <label className="file-upload-label">
+                      Selecionar Arquivo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="file-upload-input"
+                      />
+                    </label>
+                  </div>
+                </div>
+                {imagemUrl && (
+                  <div className="image-preview-container">
+                    <img src={imagemUrl} alt="Preview" className="composer-image-preview" />
+                    <button type="button" className="btn-remove-image" onClick={() => setImagemUrl('')}>Remover Imagem</button>
+                  </div>
+                )}
+              </div>
+
               <div className="composer-toolbar">
                 <div className="secao-visibilidade">
                   <p className="secao-label">Visibilidade</p>
@@ -206,6 +249,11 @@ export default function Postagem() {
                     </div>
                   </div>
                   <p>{texto.trim() || 'Seu post vai aparecer aqui conforme voce escreve.'}</p>
+                  {imagemUrl && (
+                    <div className="post-image-container">
+                      <img src={imagemUrl} alt="Preview do Post" className="post-image" />
+                    </div>
+                  )}
                 </div>
               </article>
 
@@ -230,6 +278,12 @@ export default function Postagem() {
                 <article className="post" key={post.id}>
                   <strong>{post.usuario?.nome_empresa || post.usuario?.nomecompleto || 'Usuario'}</strong>
                   <p>{post.content}</p>
+
+                  {post.image_url && (
+                    <div className="post-image-container">
+                      <img src={post.image_url} alt="Imagem do post" className="post-image" />
+                    </div>
+                  )}
 
                   {post.hashtags && post.hashtags.length > 0 && (
                     <p className="post-hashtags">

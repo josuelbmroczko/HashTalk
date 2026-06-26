@@ -34,7 +34,7 @@ const getAllPosts = async (req, res) => {
 
 const createPost = async (req, res) => {
     try {
-        const { content, usuario_id } = req.body;
+        const { content, usuario_id, image_url } = req.body;
         const usuarioId = req.userInfo?.id || usuario_id;
 
         if (!content) {
@@ -65,6 +65,7 @@ const createPost = async (req, res) => {
             data: {
                 content,
                 hashtags,
+                image_url,
                 usuario_id: parseInt(usuarioId)
             },
             include: postInclude

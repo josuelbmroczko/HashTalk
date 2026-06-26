@@ -53,6 +53,11 @@ export default function Hashtag() {
                                 <div className="post" key={post.id}>
                                     <strong>{post.usuario?.nome_empresa || post.usuario?.nomecompleto || "Usuário"}</strong>
                                     <p>{post.content}</p>
+                                    {post.image_url && (
+                                        <div className="post-image-container">
+                                            <img src={post.image_url} alt="Imagem do post" className="post-image" />
+                                        </div>
+                                    )}
                                     {post.hashtags && post.hashtags.length > 0 && (
                                         <p style={{ color: '#007bff' }}>
                                             {post.hashtags.map((tag, idx) => (

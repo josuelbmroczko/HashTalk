@@ -21,6 +21,8 @@ model Usuario {
   cargo_responsavel String?  @db.VarChar(255)
   nome_empresa      String?  @db.VarChar(255)
   criado_em         DateTime @default(now()) @db.Timestamptz()
+  avatar_url        String?  @db.Text
+  capa_url          String?  @db.Text
   
   // Chave estrangeira (Autorelacionamento)
   // O ID da empresa à qual o funcionário pertence
@@ -39,6 +41,7 @@ model Post {
   id        Int      @id @default(autoincrement())
   content   String   @db.Text
   hashtags  String[] @db.VarChar(100)
+  image_url String?  @db.Text
   created_at DateTime @default(now()) @db.Timestamptz()
 
   // Chave estrangeira (Foreign Key) para usuario
