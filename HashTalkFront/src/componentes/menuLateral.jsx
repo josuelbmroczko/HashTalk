@@ -12,7 +12,6 @@ const navItems = [
   { to: "/home", label: "Inicio", icon: FaHome },
   { to: "/explorar", label: "Explorar", icon: MdExplore },
   { to: "/notificacoes", label: "Notificacoes", icon: FaBell, disabled: true },
-  { to: "/minhaempresa", label: "Minha empresa", icon: IoIosBusiness },
   { to: "/parceiros", label: "Parceiros", icon: FaHandshake },
   { to: "/mensagens", label: "Mensagens", icon: FaEnvelope },
   { to: "/perfil", label: "Perfil", icon: FaUser },
