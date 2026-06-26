@@ -7,7 +7,9 @@ router.use(authMiddleware.verifyToken);
 router.use(authMiddleware.verifyUserExists);
 
 // Rotas de usuários
+router.get('/', usuarioController.listarUsuarios);
 router.get('/colegas', usuarioController.listarColegas);
+router.get('/search', usuarioController.buscarUsuarios);
 router.get('/:id', usuarioController.getPerfilUsuario);
 
 module.exports = router;

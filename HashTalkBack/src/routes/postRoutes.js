@@ -17,5 +17,7 @@ router.get('/empresa/:empresaId', postController.getPostsByEmpresa);
 router.get('/empresa/nome/:nomeEmpresa', postController.getPostsByEmpresaNome);
 router.get('/hashtag/:hashtag', postController.getPostsByHashtag);
 router.delete('/:postId', postController.deletePost);
+router.post('/:id/like', postController.likePost);
+router.post('/:id/comment', postController.commentPost);
 
 module.exports = router;

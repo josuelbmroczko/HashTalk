@@ -10,7 +10,29 @@ const postInclude = {
             email: true,
             role: true,
             nome_empresa: true,
-            empresa_id: true
+            empresa_id: true,
+            avatar_url: true
+        }
+    },
+    comments: {
+        include: {
+            usuario: {
+                select: {
+                    id: true,
+                    nomecompleto: true,
+                    username: true,
+                    avatar_url: true,
+                    nome_empresa: true
+                }
+            }
+        },
+        orderBy: {
+            created_at: 'asc'
+        }
+    },
+    likes: {
+        select: {
+            usuario_id: true
         }
     }
 };
@@ -267,6 +289,89 @@ const getPostsColegas = async (req, res) => {
     }
 };
 
+const likePost = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user?.id || req.userInfo?.id);
+        const postId = parseInt(req.params.id);
+
+        if (isNaN(postId)) {
+            return res.status(400).json({ error: 'ID do post inválido.' });
+        }
+
+        // Check if already liked
+        const existingLike = await prisma.like.findUnique({
+            where: {
+                post_id_usuario_id: {
+                    post_id: postId,
+                    usuario_id: loggedUserId
+                }
+            }
+        });
+
+        if (existingLike) {
+            // Unlike
+            await prisma.like.delete({
+                where: {
+                    id: existingLike.id
+                }
+            });
+            return res.json({ liked: false });
+        } else {
+            // Like
+            await prisma.like.create({
+                data: {
+                    post_id: postId,
+                    usuario_id: loggedUserId
+                }
+            });
+            return res.status(201).json({ liked: true });
+        }
+    } catch (error) {
+        console.error('Erro ao curtir postagem:', error);
+        res.status(500).json({ error: 'Erro interno ao curtir postagem.' });
+    }
+};
+
+const commentPost = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user?.id || req.userInfo?.id);
+        const postId = parseInt(req.params.id);
+        const { content } = req.body;
+
+        if (isNaN(postId)) {
+            return res.status(400).json({ error: 'ID do post inválido.' });
+        }
+
+        if (!content || content.trim() === '') {
+            return res.status(400).json({ error: 'Conteúdo do comentário é obrigatório.' });
+        }
+
+        const comment = await prisma.comment.create({
+            data: {
+                content: content.trim(),
+                post_id: postId,
+                usuario_id: loggedUserId
+            },
+            include: {
+                usuario: {
+                    select: {
+                        id: true,
+                        nomecompleto: true,
+                        username: true,
+                        avatar_url: true,
+                        nome_empresa: true
+                    }
+                }
+            }
+        });
+
+        res.status(201).json(comment);
+    } catch (error) {
+        console.error('Erro ao comentar postagem:', error);
+        res.status(500).json({ error: 'Erro interno ao comentar postagem.' });
+    }
+};
+
 module.exports = {
     getAllPosts,
     createPost,
@@ -276,5 +381,7 @@ module.exports = {
     getPostsByEmpresaNome,
     getPostsByHashtag,
     deletePost,
-    getPostsColegas
+    getPostsColegas,
+    likePost,
+    commentPost
 };

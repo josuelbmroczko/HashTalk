@@ -49,11 +49,15 @@ const cadastrarUsuario = async (req, res) => {
 
 const listarUsuarios = async (req, res) => {
     try {
+        const loggedUserId = parseInt(req.user.id);
         const usuarios = await prisma.usuario.findMany({
+            where: {
+                id: { not: loggedUserId }
+            },
             select: {
                 id: true, nomecompleto: true, username: true, email: true,
                 role: true, cargo_responsavel: true, nome_empresa: true,
-                empresa_id: true, criado_em: true
+                empresa_id: true, criado_em: true, avatar_url: true
             }
         });
         res.json(usuarios);
@@ -179,11 +183,50 @@ const listarColegas = async (req, res) => {
     }
 };
 
+const buscarUsuarios = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) {
+            return res.json([]);
+        }
+        const loggedUserId = parseInt(req.user.id);
+        const users = await prisma.usuario.findMany({
+            where: {
+                AND: [
+                    { id: { not: loggedUserId } },
+                    {
+                        OR: [
+                            { nomecompleto: { contains: q, mode: 'insensitive' } },
+                            { username: { contains: q, mode: 'insensitive' } },
+                            { email: { contains: q, mode: 'insensitive' } }
+                        ]
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                nomecompleto: true,
+                username: true,
+                email: true,
+                avatar_url: true,
+                nome_empresa: true,
+                role: true
+            },
+            take: 20
+        });
+        res.json(users);
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
+    }
+};
+
 module.exports = {
     cadastrarUsuario,
     listarUsuarios,
     listarFuncionarios,
     listarEmpresas,
     getPerfilUsuario,
-    listarColegas
+    listarColegas,
+    buscarUsuarios
 };
