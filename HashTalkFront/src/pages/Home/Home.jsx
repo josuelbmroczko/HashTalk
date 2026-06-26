@@ -81,7 +81,7 @@ export default function Home() {
               const alreadyLiked = p.likes?.some((l) => l.usuario_id === loggedUser.id);
               const updatedLikes = alreadyLiked
                 ? p.likes.filter((l) => l.usuario_id !== loggedUser.id)
-                : [...(p.likes || []), { usuario_id: loggedUser.id }];
+                : [...(p.likes || []), { usuario_id: loggedUser.id, usuario: { nomecompleto: loggedUser.nomecompleto || loggedUser.nomeFuncionario, nome_empresa: loggedUser.nomeEmpresa } }];
               return { ...p, likes: updatedLikes };
             }
             return p;
@@ -134,7 +134,7 @@ export default function Home() {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container home-shell">
       <MenuLateral />
 
       <div className="content-wrapper">
@@ -203,7 +203,15 @@ export default function Home() {
                     )}
 
                     {/* Likes and Comments Actions */}
-                    <div className="post-actions" style={{ display: "flex", gap: "24px", marginTop: "15px", paddingTop: "12px", borderTop: "1px solid #e2e8f0" }}>
+                    {post.likes && post.likes.length > 0 && (
+                      <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: "10px" }}>
+                        {post.likes.some(l => l.usuario_id === loggedUser?.id)
+                          ? `Você ${post.likes.length > 1 ? `e outras ${post.likes.length - 1} pessoas curtiram isso` : 'curtiu isso'}`
+                          : `Curtido por ${post.likes[0]?.usuario?.nome_empresa || post.likes[0]?.usuario?.nomecompleto || 'Usuário'}${post.likes.length > 1 ? ` e outras ${post.likes.length - 1} pessoas` : ''}`
+                        }
+                      </div>
+                    )}
+                    <div className="post-actions" style={{ display: "flex", gap: "24px", marginTop: "10px", paddingTop: "12px", borderTop: "1px solid #e2e8f0" }}>
                       <button 
                         onClick={() => handleLike(post.id)}
                         style={{

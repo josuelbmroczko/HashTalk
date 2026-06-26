@@ -1,58 +1,211 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaEnvelope, FaSearch } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import MenuLateral from "../../componentes/menuLateral";
+import { API_URL } from "../../config/api";
 import "./parceiros.css";
 
-/*dados ficticios para representação*/
-const PARCEIROS = [
-  { id: 1, sigla: "IN", nome: "Inova Ltda.",      handle: "@inovaltda",      setor: "Produto",      bg: "#FEF3C7", cor: "#92400E" },
-  { id: 2, sigla: "GR", nome: "Grupo Resolve",    handle: "@gruporesolve",   setor: "Logística",    bg: "#EDE9FE", cor: "#5B21B6" },
-  { id: 3, sigla: "BF", nome: "BizFlow",          handle: "@bizflow",        setor: "Financeiro",   bg: "#EAF3DE", cor: "#3B6D11" },
-  { id: 4, sigla: "AC", nome: "Allume Corp",      handle: "@allumecorp",     setor: "Tecnologia",   bg: "#FBEAF0", cor: "#993556" },
-  { id: 5, sigla: "DC", nome: "Dev Comunidade",   handle: "@devcomunidade",  setor: "Educação",     bg: "#E6F1FB", cor: "#185FA5" },
-  { id: 6, sigla: "NX", nome: "Nexora Solutions", handle: "@nexorasol",      setor: "Consultoria",  bg: "#E0F7FA", cor: "#0DA8B5" },
-];
-
-const SUGESTOES = [
-  { id: 1, sigla: "MT", nome: "Maximus Tech",      setor: "Tecnologia",  bg: "#FEF3C7", cor: "#92400E" },
-  { id: 2, sigla: "VP", nome: "Veritas Partners",  setor: "Finanças",    bg: "#EDE9FE", cor: "#5B21B6" },
-  { id: 3, sigla: "OG", nome: "Omega Global",      setor: "Logística",   bg: "#EAF3DE", cor: "#3B6D11" },
-  { id: 4, sigla: "CR", nome: "Cora Retail",       setor: "Varejo B2B",  bg: "#FBEAF0", cor: "#993556" },
-];
-
 const ABAS = ["Parceiros atuais", "Seguindo", "Seguidores"];
+const AVATAR_COLORS = [
+  ["#FEF3C7", "#92400E"],
+  ["#EDE9FE", "#5B21B6"],
+  ["#EAF3DE", "#3B6D11"],
+  ["#FBEAF0", "#993556"],
+  ["#E6F1FB", "#185FA5"],
+  ["#E0F7FA", "#0DA8B5"],
+];
 
-/*componente principal*/
+const getDisplayName = (usuario) =>
+  usuario?.nome_empresa || usuario?.nomecompleto || "Usuario";
+
+const getSetor = (usuario) =>
+  usuario?.cargo_responsavel || (usuario?.role === "EMPRESA" ? "Empresa" : "Profissional");
+
+const getInitials = (name) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase() || "HT";
+
+const withAvatarStyle = (usuario) => {
+  const [bg, cor] = AVATAR_COLORS[usuario.id % AVATAR_COLORS.length];
+  const nome = getDisplayName(usuario);
+  return {
+    ...usuario,
+    nome,
+    sigla: getInitials(nome),
+    handle: `@${usuario.username}`,
+    setor: getSetor(usuario),
+    bg,
+    cor,
+  };
+};
+
 export default function Parceiros() {
-  const [abaAtiva, setAbaAtiva]     = useState(0);
-  const [busca, setBusca]           = useState("");
-  const [seguindo, setSeguindo]     = useState(new Set(PARCEIROS.map((p) => p.id)));
-  const [sugeridos, setSugeridos]   = useState(new Set());
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const [abaAtiva, setAbaAtiva] = useState(0);
+  const [busca, setBusca] = useState("");
+  const [usuarios, setUsuarios] = useState([]);
+  const [seguindo, setSeguindo] = useState([]);
+  const [seguidores, setSeguidores] = useState([]);
+  const [sugestoes, setSugestoes] = useState([]);
+  const [counts, setCounts] = useState({ following: 0, followers: 0, suggestions: 0 });
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState("");
+  const [followLoading, setFollowLoading] = useState(null);
 
-  const parceirosFiltrados = PARCEIROS.filter((p) =>
-    p.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    p.setor.toLowerCase().includes(busca.toLowerCase())
-  );
+  const carregarParceiros = async () => {
+    if (!token) return;
 
-  const handleUnfollow = (id) => {
-    setSeguindo((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
+    try {
+      setErro("");
+      const usuariosRes = await fetch(`${API_URL}/api/usuarios`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!usuariosRes.ok) {
+        throw new Error("Nao foi possivel carregar parceiros.");
+      }
+
+      const usuariosData = await usuariosRes.json();
+      const followingFromUsers = usuariosData.filter((usuario) => usuario.isFollowing);
+      const followersList = [];
+      const suggestionsList = usuariosData.filter((usuario) => !usuario.isFollowing);
+      const followingIds = new Set(followingFromUsers.map((usuario) => usuario.id));
+
+      setUsuarios(usuariosData.map((usuario) => withAvatarStyle({
+        ...usuario,
+        isFollowing: usuario.isFollowing || followingIds.has(usuario.id),
+      })));
+      setSeguindo(followingFromUsers.map(withAvatarStyle));
+      setSeguidores(followersList.map(withAvatarStyle));
+      setSugestoes(suggestionsList.map(withAvatarStyle));
+      setCounts({
+        following: followingFromUsers.length,
+        followers: followersList.length,
+        suggestions: suggestionsList.length,
+      });
+    } catch (error) {
+      console.error("Erro ao carregar parceiros:", error);
+      setErro(error.message || "Erro ao carregar parceiros.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleFollow = (id) => {
-    setSugeridos((prev) => new Set(prev).add(id));
+  useEffect(() => {
+    carregarParceiros();
+  }, [token]);
+
+  const listaAtiva = useMemo(() => {
+    if (abaAtiva === 1) return seguindo;
+    if (abaAtiva === 2) return seguidores;
+    return usuarios;
+  }, [abaAtiva, seguidores, seguindo, usuarios]);
+
+  const parceirosFiltrados = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    if (!termo) return listaAtiva;
+
+    return listaAtiva.filter((p) =>
+      [p.nome, p.handle, p.setor, p.email]
+        .filter(Boolean)
+        .some((campo) => campo.toLowerCase().includes(termo))
+    );
+  }, [busca, listaAtiva]);
+
+  const toggleFollow = async (usuarioId) => {
+    if (followLoading === usuarioId) return;
+
+    setFollowLoading(usuarioId);
+    try {
+      const res = await fetch(`${API_URL}/api/usuarios/${usuarioId}/follow`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Nao foi possivel atualizar o parceiro.");
+      }
+
+      const data = await res.json();
+      const isFollowing = Boolean(data.following);
+      const parceiroAtual =
+        usuarios.find((usuario) => usuario.id === usuarioId) ||
+        sugestoes.find((usuario) => usuario.id === usuarioId) ||
+        seguindo.find((usuario) => usuario.id === usuarioId) ||
+        seguidores.find((usuario) => usuario.id === usuarioId);
+
+      const parceiroAtualizado = parceiroAtual
+        ? withAvatarStyle({
+            ...parceiroAtual,
+            isFollowing,
+            totalSeguidores: data.totalSeguidores ?? parceiroAtual.totalSeguidores,
+          })
+        : null;
+
+      setUsuarios((prev) =>
+        prev.map((usuario) =>
+          usuario.id === usuarioId
+            ? withAvatarStyle({
+                ...usuario,
+                isFollowing,
+                totalSeguidores: data.totalSeguidores ?? usuario.totalSeguidores,
+              })
+            : usuario
+        )
+      );
+
+      setSugestoes((prev) => {
+        const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+        return isFollowing || !parceiroAtualizado ? semParceiro : [parceiroAtualizado, ...semParceiro];
+      });
+
+      setSeguindo((prev) => {
+        const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+        return isFollowing && parceiroAtualizado ? [parceiroAtualizado, ...semParceiro] : semParceiro;
+      });
+
+      setSeguidores((prev) =>
+        prev.map((usuario) =>
+          usuario.id === usuarioId ? { ...usuario, isFollowing } : usuario
+        )
+      );
+
+      setCounts((prev) => ({
+        ...prev,
+        following: Math.max(0, (prev.following || 0) + (isFollowing ? 1 : -1)),
+        suggestions: Math.max(0, (prev.suggestions || 0) + (isFollowing ? -1 : 1)),
+      }));
+    } catch (error) {
+      console.error("Erro ao seguir parceiro:", error);
+      setErro(error.message || "Erro ao seguir parceiro.");
+    } finally {
+      setFollowLoading(null);
+    }
   };
+
+  const abrirMensagem = (usuarioId) => {
+    navigate(`/mensagens?userId=${usuarioId}`);
+  };
+
+  const abrirPerfil = (usuarioId) => {
+    navigate(`/perfil/${usuarioId}`);
+  };
+
+  const destaque = sugestoes[0] || seguidores[0] || seguindo[0] || usuarios[0];
+  const countAtivo = abaAtiva === 1 ? counts.following : abaAtiva === 2 ? counts.followers : usuarios.length;
 
   return (
     <div className="parceiros-page">
-    {/* //reinderizando o menu lateral */}
-    <MenuLateral/>
+      <MenuLateral />
 
       <div className="parceiros-container">
-        {/*area principal*/}
         <main className="parceiros-main">
           <div className="parceiros-header">
             <div className="parceiros-header-top">
@@ -74,6 +227,7 @@ export default function Parceiros() {
               {ABAS.map((aba, i) => (
                 <button
                   key={aba}
+                  type="button"
                   role="tab"
                   aria-selected={abaAtiva === i}
                   className={`parceiros-tab${abaAtiva === i ? " active" : ""}`}
@@ -87,22 +241,32 @@ export default function Parceiros() {
 
           <div className="parceiros-body">
             <div className="parceiros-section-label">
-              <span>Parceiros atuais</span>
+              <span>{ABAS[abaAtiva]}</span>
               <span className="parceiros-count-badge">
-                {parceirosFiltrados.length} empresas
+                {countAtivo || 0} {countAtivo === 1 ? "contato" : "contatos"}
               </span>
             </div>
 
+            {erro && <div className="parceiros-feedback">{erro}</div>}
+
             <ul className="parceiros-list" role="list">
-              {parceirosFiltrados.map((p) => (
-                <li key={p.id} className="parceiro-item">
-                  <div
-                    className="parceiro-avatar"
-                    style={{ background: p.bg, color: p.cor }}
-                    aria-hidden="true"
-                  >
-                    {p.sigla}
-                  </div>
+              {loading && (
+                <li className="parceiros-empty">Carregando parceiros...</li>
+              )}
+
+              {!loading && parceirosFiltrados.map((p) => (
+                <li key={p.id} className="parceiro-item" onClick={() => abrirPerfil(p.id)}>
+                  {p.avatar_url ? (
+                    <img className="parceiro-avatar" src={p.avatar_url} alt={p.nome} />
+                  ) : (
+                    <div
+                      className="parceiro-avatar"
+                      style={{ background: p.bg, color: p.cor }}
+                      aria-hidden="true"
+                    >
+                      {p.sigla}
+                    </div>
+                  )}
 
                   <div className="parceiro-info">
                     <p className="parceiro-nome">{p.nome}</p>
@@ -110,9 +274,11 @@ export default function Parceiros() {
                     <span className="parceiro-setor">{p.setor}</span>
                   </div>
 
-                  <div className="parceiro-acoes">
+                  <div className="parceiro-acoes" onClick={(e) => e.stopPropagation()}>
                     <button
+                      type="button"
                       className="btn-mensagem"
+                      onClick={() => abrirMensagem(p.id)}
                       aria-label={`Enviar mensagem para ${p.nome}`}
                     >
                       <FaEnvelope className="icone" aria-hidden="true" />
@@ -120,98 +286,129 @@ export default function Parceiros() {
                     </button>
 
                     <button
-                      className="btn-seguindo"
-                      onClick={() => handleUnfollow(p.id)}
-                      aria-label={`Deixar de seguir ${p.nome}`}
+                      type="button"
+                      className={`btn-seguindo${p.isFollowing ? "" : " seguir"}`}
+                      onClick={() => toggleFollow(p.id)}
+                      disabled={followLoading === p.id}
+                      aria-label={p.isFollowing ? `Deixar de seguir ${p.nome}` : `Seguir ${p.nome}`}
                     >
-                      {seguindo.has(p.id) ? "Seguindo" : "Seguir"}
+                      {followLoading === p.id ? "..." : p.isFollowing ? "Seguindo" : "Seguir"}
                     </button>
                   </div>
                 </li>
               ))}
 
-              {parceirosFiltrados.length === 0 && (
-                <li style={{ padding: "24px", textAlign: "center", color: "var(--color-muted)", fontSize: "0.88rem" }}>
-                  Nenhum parceiro encontrado para "{busca}".
+              {!loading && parceirosFiltrados.length === 0 && (
+                <li className="parceiros-empty">
+                  Nenhum parceiro encontrado{busca ? ` para "${busca}"` : ""}.
                 </li>
               )}
             </ul>
           </div>
         </main>
 
-        {/*coluna lateral*/}
-        <aside className="parceiros-sidebar" aria-label="Sugestões de parceiros">
-          <p className="sidebar-section-title">Sugestões para você</p>
+        <aside className="parceiros-sidebar" aria-label="Sugestoes de parceiros">
+          <p className="sidebar-section-title">Sugestoes para voce</p>
 
           <div className="sugestoes-grid">
-            {SUGESTOES.map((s) => (
-              <div key={s.id} className="sugestao-card">
-                <div
-                  className="sugestao-avatar"
-                  style={{ background: s.bg, color: s.cor }}
-                  aria-hidden="true"
-                >
-                  {s.sigla}
-                </div>
+            {sugestoes.slice(0, 4).map((s) => (
+              <div key={s.id} className="sugestao-card" onClick={() => abrirPerfil(s.id)}>
+                {s.avatar_url ? (
+                  <img className="sugestao-avatar" src={s.avatar_url} alt={s.nome} />
+                ) : (
+                  <div
+                    className="sugestao-avatar"
+                    style={{ background: s.bg, color: s.cor }}
+                    aria-hidden="true"
+                  >
+                    {s.sigla}
+                  </div>
+                )}
                 <div>
                   <p className="sugestao-nome">{s.nome}</p>
                   <p className="sugestao-setor">{s.setor}</p>
                 </div>
                 <button
+                  type="button"
                   className="btn-seguir"
-                  onClick={() => handleFollow(s.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFollow(s.id);
+                  }}
+                  disabled={followLoading === s.id}
                   aria-label={`Seguir ${s.nome}`}
                 >
-                  {sugeridos.has(s.id) ? "Seguindo ✓" : "+ Seguir"}
+                  {followLoading === s.id ? "..." : "+ Seguir"}
                 </button>
               </div>
             ))}
+
+            {!loading && sugestoes.length === 0 && (
+              <div className="parceiros-empty compact">Sem novas sugestoes.</div>
+            )}
           </div>
 
-          {/*perfil em destaque*/}
-          <p className="sidebar-section-title" style={{ marginTop: "4px" }}>
-            Perfil em destaque
-          </p>
-
-          <div className="perfil-destaque">
-            <div className="perfil-destaque-cover" />
-
-            <div className="perfil-destaque-body">
-              <div className="perfil-destaque-avatar-wrap">
-                <div
-                  className="perfil-destaque-avatar"
-                  style={{ background: "#E0F7FA", color: "#0DA8B5" }}
-                  aria-hidden="true"
-                >
-                  AL
-                </div>
-              </div>
-
-              <p className="perfil-destaque-nome">Allume Tech</p>
-              <p className="perfil-destaque-handle">@allumetech</p>
-              <span className="perfil-destaque-setor">Tecnologia · SaaS</span>
-              <p className="perfil-destaque-bio">
-                Soluções inteligentes para o mercado B2B. Mais de 500 clientes ativos.
+          {destaque && (
+            <>
+              <p className="sidebar-section-title" style={{ marginTop: "4px" }}>
+                Perfil em destaque
               </p>
 
-              <div className="perfil-destaque-stats">
-                <div className="perfil-stat">
-                  <p className="perfil-stat-numero">214</p>
-                  <p className="perfil-stat-label">Posts</p>
-                </div>
-                <div className="perfil-stat">
-                  <p className="perfil-stat-numero">1.2k</p>
-                  <p className="perfil-stat-label">Seguidores</p>
-                </div>
-                <div className="perfil-stat">
-                  <p className="perfil-stat-numero">430</p>
-                  <p className="perfil-stat-label">Seguindo</p>
+              <div className="perfil-destaque" onClick={() => abrirPerfil(destaque.id)}>
+                <div className="perfil-destaque-cover" />
+
+                <div className="perfil-destaque-body">
+                  <div className="perfil-destaque-avatar-wrap">
+                    {destaque.avatar_url ? (
+                      <img className="perfil-destaque-avatar" src={destaque.avatar_url} alt={destaque.nome} />
+                    ) : (
+                      <div
+                        className="perfil-destaque-avatar"
+                        style={{ background: destaque.bg, color: destaque.cor }}
+                        aria-hidden="true"
+                      >
+                        {destaque.sigla}
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="perfil-destaque-nome">{destaque.nome}</p>
+                  <p className="perfil-destaque-handle">{destaque.handle}</p>
+                  <span className="perfil-destaque-setor">{destaque.setor}</span>
+                  <p className="perfil-destaque-bio">
+                    Perfil corporativo para conexoes, tendencias e oportunidades B2B.
+                  </p>
+
+                  <div className="perfil-destaque-stats">
+                    <div className="perfil-stat">
+                      <p className="perfil-stat-numero">{destaque.totalPosts || 0}</p>
+                      <p className="perfil-stat-label">Posts</p>
+                    </div>
+                    <div className="perfil-stat">
+                      <p className="perfil-stat-numero">{destaque.totalSeguidores || 0}</p>
+                      <p className="perfil-stat-label">Seguidores</p>
+                    </div>
+                    <div className="perfil-stat">
+                      <p className="perfil-stat-numero">{destaque.totalSeguindo || 0}</p>
+                      <p className="perfil-stat-label">Seguindo</p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn-seguir-destaque"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      destaque.isFollowing ? abrirMensagem(destaque.id) : toggleFollow(destaque.id);
+                    }}
+                    disabled={followLoading === destaque.id}
+                  >
+                    {destaque.isFollowing ? "Enviar mensagem" : "+ Seguir empresa"}
+                  </button>
                 </div>
               </div>
-
-              <button className="btn-seguir-destaque">+ Seguir empresa</button>
-            </div>
-          </div>
+            </>
+          )}
         </aside>
       </div>
     </div>

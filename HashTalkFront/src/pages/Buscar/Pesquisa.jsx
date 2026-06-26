@@ -32,7 +32,7 @@ function Pesquisa() {
     .slice(0, 6);
 
   return (
-    <div className="app-container">
+    <div className="app-container explorar-shell">
       <MenuLateral />
 
       <div className="content-wrapper">

@@ -32,7 +32,14 @@ const postInclude = {
     },
     likes: {
         select: {
-            usuario_id: true
+            usuario_id: true,
+            usuario: {
+                select: {
+                    id: true,
+                    nomecompleto: true,
+                    nome_empresa: true
+                }
+            }
         }
     }
 };

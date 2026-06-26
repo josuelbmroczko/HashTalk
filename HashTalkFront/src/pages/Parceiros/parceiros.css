@@ -175,6 +175,7 @@
   font-size: 0.8rem;
   font-weight: 800;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 /*infos*/
@@ -258,6 +259,45 @@
   border-color: #fca5a5;
 }
 
+.btn-seguindo.seguir {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.btn-seguindo.seguir:hover {
+  background: var(--color-primary-dark);
+  color: #fff;
+  border-color: var(--color-primary-dark);
+}
+
+.btn-seguindo:disabled,
+.btn-seguir:disabled,
+.btn-seguir-destaque:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.parceiros-feedback,
+.parceiros-empty {
+  padding: 18px;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+}
+
+.parceiros-feedback {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #991b1b;
+}
+
+.parceiros-empty.compact {
+  grid-column: 1 / -1;
+  padding: 12px 4px;
+}
+
 /*coluna lateral - sugestões*/
 .parceiros-sidebar {
   padding: 20px 16px;
@@ -312,6 +352,7 @@
   justify-content: center;
   font-size: 0.8rem;
   font-weight: 800;
+  object-fit: cover;
 }
 
 .sugestao-nome {
@@ -375,6 +416,7 @@
   font-size: 0.78rem;
   font-weight: 800;
   border: 2px solid #fff;
+  object-fit: cover;
 }
 
 .perfil-destaque-nome {

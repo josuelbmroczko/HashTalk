@@ -50,20 +50,121 @@ const cadastrarUsuario = async (req, res) => {
 const listarUsuarios = async (req, res) => {
     try {
         const loggedUserId = parseInt(req.user.id);
-        const usuarios = await prisma.usuario.findMany({
-            where: {
-                id: { not: loggedUserId }
-            },
-            select: {
-                id: true, nomecompleto: true, username: true, email: true,
-                role: true, cargo_responsavel: true, nome_empresa: true,
-                empresa_id: true, criado_em: true, avatar_url: true
-            }
-        });
-        res.json(usuarios);
+        const [usuarios, seguindo] = await Promise.all([
+            prisma.usuario.findMany({
+                where: {
+                    id: { not: loggedUserId }
+                },
+                select: {
+                    id: true, nomecompleto: true, username: true, email: true,
+                    role: true, cargo_responsavel: true, nome_empresa: true,
+                    empresa_id: true, criado_em: true, avatar_url: true,
+                    _count: {
+                        select: {
+                            seguidores: true,
+                            seguindo: true,
+                            posts: true
+                        }
+                    }
+                }
+            }),
+            prisma.follow.findMany({
+                where: { followerId: loggedUserId },
+                select: { followedId: true }
+            })
+        ]);
+
+        const seguindoIds = new Set(seguindo.map((follow) => follow.followedId));
+
+        res.json(usuarios.map((usuario) => {
+            const { _count, ...dadosUsuario } = usuario;
+            return {
+                ...dadosUsuario,
+                isFollowing: seguindoIds.has(usuario.id),
+                totalSeguidores: _count.seguidores,
+                totalSeguindo: _count.seguindo,
+                totalPosts: _count.posts
+            };
+        }));
     } catch (error) {
         console.error('Erro ao buscar usuários:', error);
         res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
+    }
+};
+
+const listarRelacionamentos = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user.id);
+        const selectUsuario = {
+            id: true,
+            nomecompleto: true,
+            username: true,
+            email: true,
+            role: true,
+            cargo_responsavel: true,
+            nome_empresa: true,
+            avatar_url: true,
+            _count: {
+                select: {
+                    seguidores: true,
+                    seguindo: true,
+                    posts: true
+                }
+            }
+        };
+
+        const [followingRows, followerRows] = await Promise.all([
+            prisma.follow.findMany({
+                where: { followerId: loggedUserId },
+                orderBy: { created_at: 'desc' },
+                include: { followed: { select: selectUsuario } }
+            }),
+            prisma.follow.findMany({
+                where: { followedId: loggedUserId },
+                orderBy: { created_at: 'desc' },
+                include: { follower: { select: selectUsuario } }
+            })
+        ]);
+
+        const followingIds = new Set(followingRows.map((row) => row.followedId));
+
+        const suggestions = await prisma.usuario.findMany({
+            where: {
+                AND: [
+                    { id: { not: loggedUserId } },
+                    { id: { notIn: Array.from(followingIds) } }
+                ]
+            },
+            orderBy: { criado_em: 'desc' },
+            take: 8,
+            select: selectUsuario
+        });
+
+        const normalize = (usuario, isFollowing = false) => {
+            const { _count, ...dadosUsuario } = usuario;
+            return {
+                ...dadosUsuario,
+                isFollowing,
+                totalSeguidores: _count.seguidores,
+                totalSeguindo: _count.seguindo,
+                totalPosts: _count.posts
+            };
+        };
+
+        res.json({
+            following: followingRows.map((row) => normalize(row.followed, true)),
+            followers: followerRows.map((row) => normalize(row.follower, followingIds.has(row.followerId))),
+            suggestions: suggestions.map((usuario) => normalize(usuario, false)),
+            counts: {
+                following: followingRows.length,
+                followers: followerRows.length,
+                mutual: followerRows.filter((row) => followingIds.has(row.followerId)).length,
+                suggestions: suggestions.length
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao listar relacionamentos:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar parceiros.' });
     }
 };
 
@@ -108,6 +209,10 @@ const getPerfilUsuario = async (req, res) => {
         const { id } = req.params;
         const usuarioId = parseInt(id);
 
+        if (isNaN(usuarioId)) {
+            return res.status(400).json({ error: 'ID de usuario invalido.' });
+        }
+
         // 1. Busca o usuário
         const usuario = await prisma.usuario.findUnique({ 
             where: { id: usuarioId },
@@ -127,11 +232,82 @@ const getPerfilUsuario = async (req, res) => {
             where: { usuario_id: usuarioId }
         });
 
-        // 3. Retorna os dados combinados
-        res.json({ ...usuario, totalPosts });
+        // 3. Conta seguidores e seguindo
+        const totalSeguidores = await prisma.follow.count({
+            where: { followedId: usuarioId }
+        });
+        const totalSeguindo = await prisma.follow.count({
+            where: { followerId: usuarioId }
+        });
+
+        // 4. Verifica se o usuário logado segue
+        let isFollowing = false;
+        if (req.user && req.user.id) {
+            const loggedUserId = parseInt(req.user.id);
+            if (loggedUserId !== usuarioId) {
+                const followRecord = await prisma.follow.findUnique({
+                    where: {
+                        followerId_followedId: {
+                            followerId: loggedUserId,
+                            followedId: usuarioId
+                        }
+                    }
+                });
+                isFollowing = !!followRecord;
+            }
+        }
+
+        // 5. Retorna os dados combinados
+        res.json({ ...usuario, totalPosts, totalSeguidores, totalSeguindo, isFollowing });
     } catch (error) {
         console.error('Erro ao buscar perfil do usuário:', error);
         res.status(500).json({ error: 'Erro interno ao buscar perfil.' });
+    }
+};
+
+const toggleFollow = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user.id);
+        const { id } = req.params;
+        const targetUserId = parseInt(id);
+
+        if (isNaN(targetUserId)) {
+            return res.status(400).json({ error: 'ID de usuário inválido.' });
+        }
+        if (loggedUserId === targetUserId) {
+            return res.status(400).json({ error: 'Você não pode seguir a si mesmo.' });
+        }
+
+        const existingFollow = await prisma.follow.findUnique({
+            where: {
+                followerId_followedId: {
+                    followerId: loggedUserId,
+                    followedId: targetUserId
+                }
+            }
+        });
+
+        if (existingFollow) {
+            await prisma.follow.delete({
+                where: { id: existingFollow.id }
+            });
+            const totalSeguidores = await prisma.follow.count({ where: { followedId: targetUserId } });
+            const totalSeguindo = await prisma.follow.count({ where: { followerId: loggedUserId } });
+            return res.json({ following: false, totalSeguidores, totalSeguindo });
+        } else {
+            await prisma.follow.create({
+                data: {
+                    followerId: loggedUserId,
+                    followedId: targetUserId
+                }
+            });
+            const totalSeguidores = await prisma.follow.count({ where: { followedId: targetUserId } });
+            const totalSeguindo = await prisma.follow.count({ where: { followerId: loggedUserId } });
+            return res.status(201).json({ following: true, totalSeguidores, totalSeguindo });
+        }
+    } catch (error) {
+        console.error('Erro ao alternar follow:', error);
+        res.status(500).json({ error: 'Erro interno ao seguir usuário.' });
     }
 };
 
@@ -224,9 +400,11 @@ const buscarUsuarios = async (req, res) => {
 module.exports = {
     cadastrarUsuario,
     listarUsuarios,
+    listarRelacionamentos,
     listarFuncionarios,
     listarEmpresas,
     getPerfilUsuario,
     listarColegas,
-    buscarUsuarios
+    buscarUsuarios,
+    toggleFollow
 };

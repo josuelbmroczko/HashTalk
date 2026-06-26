@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { FaEnvelope, FaSearch, FaPaperPlane } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
 import MenuLateral from "../../componentes/menuLateral";
 import { API_URL } from "../../config/api";
 import "./Mensagens.css";
@@ -16,6 +17,7 @@ const getInitials = (name) => {
 };
 
 export default function Mensagens() {
+  const [searchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
@@ -29,6 +31,7 @@ export default function Mensagens() {
   const messagesEndRef = useRef(null);
   const loggedUser = JSON.parse(localStorage.getItem("usuario") || "{}") || {};
   const token = localStorage.getItem("token");
+  const urlUserId = searchParams.get("userId");
 
   // Fetch active conversations
   const fetchConversations = async () => {
@@ -107,6 +110,35 @@ export default function Mensagens() {
     const intervalConversations = setInterval(fetchConversations, 8000);
     return () => clearInterval(intervalConversations);
   }, [token]);
+
+  useEffect(() => {
+    if (!urlUserId || !token) return;
+
+    const userFromList = allUsers.find((user) => String(user.id) === String(urlUserId));
+    if (userFromList) {
+      setSelectedUser(userFromList);
+      setActiveTab("conversas");
+      return;
+    }
+
+    const fetchUserFromUrl = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/usuarios/${urlUserId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setSelectedUser(data);
+          setActiveTab("conversas");
+        }
+      } catch (err) {
+        console.error("Erro ao abrir conversa pela URL:", err);
+      }
+    };
+
+    fetchUserFromUrl();
+  }, [allUsers, token, urlUserId]);
 
   // Load messages and start polling when user is selected
   useEffect(() => {

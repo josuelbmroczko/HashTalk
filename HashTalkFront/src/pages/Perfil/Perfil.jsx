@@ -80,6 +80,28 @@ function Perfil() {
     }
   };
 
+  const handleFollow = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/usuarios/${id}/follow`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUserInfo(prev => ({
+          ...prev,
+          isFollowing: data.following,
+          totalSeguidores: data.following ? (prev.totalSeguidores || 0) + 1 : (prev.totalSeguidores || 1) - 1
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao seguir usuário:", error);
+    }
+  };
+
   const { id } = useParams();
   const loggedInUser = JSON.parse(localStorage.getItem("usuario"));
   const isOwnProfile = !id || parseInt(id) === loggedInUser?.id;
@@ -194,8 +216,17 @@ function Perfil() {
                   iniciais || "HT"
                 )}
               </div>
-              {isOwnProfile && (
+              {isOwnProfile ? (
                 <button type="button" className="editar-perfil" onClick={abrirModal}>Editar perfil</button>
+              ) : (
+                <button 
+                  type="button" 
+                  className="editar-perfil" 
+                  onClick={handleFollow}
+                  style={{ backgroundColor: userInfo?.isFollowing ? 'transparent' : '#0f172a', color: userInfo?.isFollowing ? '#0f172a' : '#fff' }}
+                >
+                  {userInfo?.isFollowing ? 'Deixar de Seguir' : 'Seguir'}
+                </button>
               )}
 
               <div className="perfil-identidade">
@@ -212,15 +243,15 @@ function Perfil() {
 
             <div className="perfil-numeros">
               <div>
-                <strong>{posts.length}</strong>
+                <strong>{userInfo?.totalPosts || posts.length}</strong>
                 <span>Posts</span>
               </div>
               <div>
-                <strong>842</strong>
+                <strong>{userInfo?.totalSeguidores || 0}</strong>
                 <span>Seguidores</span>
               </div>
               <div>
-                <strong>356</strong>
+                <strong>{userInfo?.totalSeguindo || 0}</strong>
                 <span>Seguindo</span>
               </div>
             </div>
