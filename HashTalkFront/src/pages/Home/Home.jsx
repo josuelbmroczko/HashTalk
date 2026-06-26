@@ -134,7 +134,7 @@ export default function Home() {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container home-shell">
       <MenuLateral />
 
       <div className="content-wrapper">
