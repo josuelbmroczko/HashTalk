@@ -1,22 +1,19 @@
-import hashtags from '../data/hashtags.json';
-import './UsarSugestao.css';
+import "./UsarSugestao.css";
 
-function UsarSugestao({sugestoes}){
-    const sugestoes = hashtags.filter((tag) => tag.nome.toLowerCase().includes(Search.toLowerCase())) 
-    
-    if (sugestoes.lenght === 0) {
-        return null;
-    }
+function UsarSugestao({ sugestoes = [], onSelect }) {
+  if (sugestoes.length === 0) {
+    return null;
+  }
 
-    return(
-        <div className="sugestoes">
-            {sugestoes.map((item) => (
-                <div key={item.id}>
-                    {item.nome}
-                    </div>
-            ))}
-        </div>
-    );
+  return (
+    <div className="sugestoes">
+      {sugestoes.map((item) => (
+        <button type="button" key={item.id || item.nome} onClick={() => onSelect(item.nome)}>
+          {item.nome}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export default UsarSugestao;

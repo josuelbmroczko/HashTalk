@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SplashPage.css";
 
 import logoIcon from "../../assets/logo.jpeg";
+import { API_URL } from "../../config/api";
 
 const SplashPage = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const SplashPage = () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify`, {
+          const response = await fetch(`${API_URL}/api/auth/verify`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

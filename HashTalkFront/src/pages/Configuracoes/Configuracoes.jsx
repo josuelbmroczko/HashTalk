@@ -56,7 +56,7 @@ export default function Configuracoes() {
         setSenhaAtual('');
         setNovaSenha('');
       }
-    } catch (err) {
+    } catch {
       setErro('Não foi possível conectar ao servidor. Verifique se o backend está rodando.');
     } finally {
       setSalvando(false);

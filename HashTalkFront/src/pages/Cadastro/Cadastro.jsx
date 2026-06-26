@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cadastro.css";
 import logoHashTalk from "../../assets/logo.jpeg";
+import { API_URL } from "../../config/api";
 
 function Cadastro() {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ function Cadastro() {
     };
 
     try {
-      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+      const resposta = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
