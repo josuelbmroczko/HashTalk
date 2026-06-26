@@ -63,31 +63,32 @@ export default function Parceiros() {
 
     try {
       setErro("");
-      const [usuariosRes, relacionamentosRes] = await Promise.all([
-        fetch(`${API_URL}/api/usuarios`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`${API_URL}/api/usuarios/relacionamentos`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
+      const usuariosRes = await fetch(`${API_URL}/api/usuarios`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      if (!usuariosRes.ok || !relacionamentosRes.ok) {
+      if (!usuariosRes.ok) {
         throw new Error("Nao foi possivel carregar parceiros.");
       }
 
       const usuariosData = await usuariosRes.json();
-      const relacionamentosData = await relacionamentosRes.json();
-      const followingIds = new Set((relacionamentosData.following || []).map((usuario) => usuario.id));
+      const followingFromUsers = usuariosData.filter((usuario) => usuario.isFollowing);
+      const followersList = [];
+      const suggestionsList = usuariosData.filter((usuario) => !usuario.isFollowing);
+      const followingIds = new Set(followingFromUsers.map((usuario) => usuario.id));
 
       setUsuarios(usuariosData.map((usuario) => withAvatarStyle({
         ...usuario,
-        isFollowing: followingIds.has(usuario.id),
+        isFollowing: usuario.isFollowing || followingIds.has(usuario.id),
       })));
-      setSeguindo((relacionamentosData.following || []).map(withAvatarStyle));
-      setSeguidores((relacionamentosData.followers || []).map(withAvatarStyle));
-      setSugestoes((relacionamentosData.suggestions || []).map(withAvatarStyle));
-      setCounts(relacionamentosData.counts || {});
+      setSeguindo(followingFromUsers.map(withAvatarStyle));
+      setSeguidores(followersList.map(withAvatarStyle));
+      setSugestoes(suggestionsList.map(withAvatarStyle));
+      setCounts({
+        following: followingFromUsers.length,
+        followers: followersList.length,
+        suggestions: suggestionsList.length,
+      });
     } catch (error) {
       console.error("Erro ao carregar parceiros:", error);
       setErro(error.message || "Erro ao carregar parceiros.");
@@ -132,7 +133,55 @@ export default function Parceiros() {
         throw new Error(data.error || "Nao foi possivel atualizar o parceiro.");
       }
 
-      await carregarParceiros();
+      const data = await res.json();
+      const isFollowing = Boolean(data.following);
+      const parceiroAtual =
+        usuarios.find((usuario) => usuario.id === usuarioId) ||
+        sugestoes.find((usuario) => usuario.id === usuarioId) ||
+        seguindo.find((usuario) => usuario.id === usuarioId) ||
+        seguidores.find((usuario) => usuario.id === usuarioId);
+
+      const parceiroAtualizado = parceiroAtual
+        ? withAvatarStyle({
+            ...parceiroAtual,
+            isFollowing,
+            totalSeguidores: data.totalSeguidores ?? parceiroAtual.totalSeguidores,
+          })
+        : null;
+
+      setUsuarios((prev) =>
+        prev.map((usuario) =>
+          usuario.id === usuarioId
+            ? withAvatarStyle({
+                ...usuario,
+                isFollowing,
+                totalSeguidores: data.totalSeguidores ?? usuario.totalSeguidores,
+              })
+            : usuario
+        )
+      );
+
+      setSugestoes((prev) => {
+        const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+        return isFollowing || !parceiroAtualizado ? semParceiro : [parceiroAtualizado, ...semParceiro];
+      });
+
+      setSeguindo((prev) => {
+        const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+        return isFollowing && parceiroAtualizado ? [parceiroAtualizado, ...semParceiro] : semParceiro;
+      });
+
+      setSeguidores((prev) =>
+        prev.map((usuario) =>
+          usuario.id === usuarioId ? { ...usuario, isFollowing } : usuario
+        )
+      );
+
+      setCounts((prev) => ({
+        ...prev,
+        following: Math.max(0, (prev.following || 0) + (isFollowing ? 1 : -1)),
+        suggestions: Math.max(0, (prev.suggestions || 0) + (isFollowing ? -1 : 1)),
+      }));
     } catch (error) {
       console.error("Erro ao seguir parceiro:", error);
       setErro(error.message || "Erro ao seguir parceiro.");

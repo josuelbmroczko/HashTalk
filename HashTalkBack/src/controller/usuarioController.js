@@ -50,17 +50,42 @@ const cadastrarUsuario = async (req, res) => {
 const listarUsuarios = async (req, res) => {
     try {
         const loggedUserId = parseInt(req.user.id);
-        const usuarios = await prisma.usuario.findMany({
-            where: {
-                id: { not: loggedUserId }
-            },
-            select: {
-                id: true, nomecompleto: true, username: true, email: true,
-                role: true, cargo_responsavel: true, nome_empresa: true,
-                empresa_id: true, criado_em: true, avatar_url: true
-            }
-        });
-        res.json(usuarios);
+        const [usuarios, seguindo] = await Promise.all([
+            prisma.usuario.findMany({
+                where: {
+                    id: { not: loggedUserId }
+                },
+                select: {
+                    id: true, nomecompleto: true, username: true, email: true,
+                    role: true, cargo_responsavel: true, nome_empresa: true,
+                    empresa_id: true, criado_em: true, avatar_url: true,
+                    _count: {
+                        select: {
+                            seguidores: true,
+                            seguindo: true,
+                            posts: true
+                        }
+                    }
+                }
+            }),
+            prisma.follow.findMany({
+                where: { followerId: loggedUserId },
+                select: { followedId: true }
+            })
+        ]);
+
+        const seguindoIds = new Set(seguindo.map((follow) => follow.followedId));
+
+        res.json(usuarios.map((usuario) => {
+            const { _count, ...dadosUsuario } = usuario;
+            return {
+                ...dadosUsuario,
+                isFollowing: seguindoIds.has(usuario.id),
+                totalSeguidores: _count.seguidores,
+                totalSeguindo: _count.seguindo,
+                totalPosts: _count.posts
+            };
+        }));
     } catch (error) {
         console.error('Erro ao buscar usuários:', error);
         res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
@@ -183,6 +208,10 @@ const getPerfilUsuario = async (req, res) => {
     try {
         const { id } = req.params;
         const usuarioId = parseInt(id);
+
+        if (isNaN(usuarioId)) {
+            return res.status(400).json({ error: 'ID de usuario invalido.' });
+        }
 
         // 1. Busca o usuário
         const usuario = await prisma.usuario.findUnique({ 
