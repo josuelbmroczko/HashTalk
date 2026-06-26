@@ -61,7 +61,7 @@ app.use((req, res) => {
   });
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`HashTalk B2B API rodando na porta ${PORT}`);
     console.log(`http://localhost:${PORT}`);

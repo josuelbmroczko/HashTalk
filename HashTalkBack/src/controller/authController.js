@@ -74,7 +74,7 @@ class AuthController {
                 });
             }
 
-            res.status(500).json({ error: 'Erro ao criar usuario' });
+            res.status(500).json({ error: 'Erro ao criar usuario', details: error.message });
         }
     }
 
@@ -147,6 +147,10 @@ class AuthController {
 
     async updateMe(req, res) {
         try {
+            if (!req.user || !req.user.id) {
+                return res.status(401).json({ error: 'Usuário não autenticado' });
+            }
+
             const { avatarUrl, capaUrl, nomecompleto, cargoFuncionario, nomeEmpresa } = req.body;
             const updateData = {};
             
@@ -156,6 +160,10 @@ class AuthController {
             if (cargoFuncionario !== undefined) updateData.cargo_responsavel = cargoFuncionario;
             if (nomeEmpresa !== undefined) updateData.nome_empresa = nomeEmpresa;
 
+            if (Object.keys(updateData).length === 0) {
+                return res.status(400).json({ error: 'Nenhum dado para atualizar' });
+            }
+
             const updated = await userService.updateUser(req.user.id, updateData);
             res.json({
                 message: 'Perfil atualizado com sucesso',
@@ -163,7 +171,7 @@ class AuthController {
             });
         } catch (error) {
             console.error('Erro ao atualizar perfil:', error);
-            res.status(500).json({ error: 'Erro interno ao atualizar perfil' });
+            res.status(500).json({ error: 'Erro interno ao atualizar perfil', details: error.message });
         }
     }
 
