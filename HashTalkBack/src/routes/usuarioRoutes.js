@@ -11,5 +11,6 @@ router.get('/', usuarioController.listarUsuarios);
 router.get('/colegas', usuarioController.listarColegas);
 router.get('/search', usuarioController.buscarUsuarios);
 router.get('/:id', usuarioController.getPerfilUsuario);
+router.post('/:id/follow', usuarioController.toggleFollow);
 
 module.exports = router;

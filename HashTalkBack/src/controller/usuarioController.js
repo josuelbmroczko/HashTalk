@@ -127,11 +127,78 @@ const getPerfilUsuario = async (req, res) => {
             where: { usuario_id: usuarioId }
         });
 
-        // 3. Retorna os dados combinados
-        res.json({ ...usuario, totalPosts });
+        // 3. Conta seguidores e seguindo
+        const totalSeguidores = await prisma.follow.count({
+            where: { followedId: usuarioId }
+        });
+        const totalSeguindo = await prisma.follow.count({
+            where: { followerId: usuarioId }
+        });
+
+        // 4. Verifica se o usuário logado segue
+        let isFollowing = false;
+        if (req.user && req.user.id) {
+            const loggedUserId = parseInt(req.user.id);
+            if (loggedUserId !== usuarioId) {
+                const followRecord = await prisma.follow.findUnique({
+                    where: {
+                        followerId_followedId: {
+                            followerId: loggedUserId,
+                            followedId: usuarioId
+                        }
+                    }
+                });
+                isFollowing = !!followRecord;
+            }
+        }
+
+        // 5. Retorna os dados combinados
+        res.json({ ...usuario, totalPosts, totalSeguidores, totalSeguindo, isFollowing });
     } catch (error) {
         console.error('Erro ao buscar perfil do usuário:', error);
         res.status(500).json({ error: 'Erro interno ao buscar perfil.' });
+    }
+};
+
+const toggleFollow = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user.id);
+        const { id } = req.params;
+        const targetUserId = parseInt(id);
+
+        if (isNaN(targetUserId)) {
+            return res.status(400).json({ error: 'ID de usuário inválido.' });
+        }
+        if (loggedUserId === targetUserId) {
+            return res.status(400).json({ error: 'Você não pode seguir a si mesmo.' });
+        }
+
+        const existingFollow = await prisma.follow.findUnique({
+            where: {
+                followerId_followedId: {
+                    followerId: loggedUserId,
+                    followedId: targetUserId
+                }
+            }
+        });
+
+        if (existingFollow) {
+            await prisma.follow.delete({
+                where: { id: existingFollow.id }
+            });
+            return res.json({ following: false });
+        } else {
+            await prisma.follow.create({
+                data: {
+                    followerId: loggedUserId,
+                    followedId: targetUserId
+                }
+            });
+            return res.status(201).json({ following: true });
+        }
+    } catch (error) {
+        console.error('Erro ao alternar follow:', error);
+        res.status(500).json({ error: 'Erro interno ao seguir usuário.' });
     }
 };
 
@@ -228,5 +295,6 @@ module.exports = {
     listarEmpresas,
     getPerfilUsuario,
     listarColegas,
-    buscarUsuarios
+    buscarUsuarios,
+    toggleFollow
 };
