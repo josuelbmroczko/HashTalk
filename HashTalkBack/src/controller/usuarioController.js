@@ -116,12 +116,12 @@ const listarRelacionamentos = async (req, res) => {
         const [followingRows, followerRows] = await Promise.all([
             prisma.follow.findMany({
                 where: { followerId: loggedUserId },
-                orderBy: { created_at: 'desc' },
+                orderBy: { id: 'desc' },
                 include: { followed: { select: selectUsuario } }
             }),
             prisma.follow.findMany({
                 where: { followedId: loggedUserId },
-                orderBy: { created_at: 'desc' },
+                orderBy: { id: 'desc' },
                 include: { follower: { select: selectUsuario } }
             })
         ]);
