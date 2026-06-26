@@ -1,9 +1,31 @@
+import { useState, useEffect } from "react";
 import MenuLateral from "../../componentes/menuLateral";
 import BarraPesquisa from "../../componentsPaginaBuscar/BarraPesquisa";
 import hashtags from "../../data/hashtags.json";
+import { API_URL } from "../../config/api";
 import "./Explorar.css";
 
 function Pesquisa() {
+  const [colegas, setColegas] = useState([]);
+
+  useEffect(() => {
+    const fetchColegas = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${API_URL}/api/usuarios/colegas`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setColegas(data.colegas || []);
+        }
+      } catch (err) {
+        console.error("Erro ao carregar colegas:", err);
+      }
+    };
+    fetchColegas();
+  }, []);
+
   const destaques = hashtags
     .filter((tag) => tag.posts)
     .sort((a, b) => b.posts - a.posts)
@@ -51,22 +73,93 @@ function Pesquisa() {
               </article>
             </div>
 
-            <section className="explorar-card">
-              <div className="explorar-card-header">
-                <span>Assuntos populares</span>
-                <strong>Principais conversas B2B para explorar hoje.</strong>
-              </div>
+            <div className="explorar-grid" style={{ marginTop: '16px' }}>
+              <section className="explorar-card">
+                <div className="explorar-card-header">
+                  <span>Assuntos populares</span>
+                  <strong>Principais conversas B2B para explorar hoje.</strong>
+                </div>
 
-              <div className="trend-list">
-                {destaques.map((tag, index) => (
-                  <a className="trend-item" href={`/hashtag/${tag.nome.replace("#", "")}`} key={tag.id}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <strong>{tag.nome}</strong>
-                    <small>{tag.posts.toLocaleString("pt-BR")} posts</small>
-                  </a>
-                ))}
-              </div>
-            </section>
+                <div className="trend-list">
+                  {destaques.map((tag, index) => (
+                    <a className="trend-item" href={`/hashtag/${tag.nome.replace("#", "")}`} key={tag.id}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <strong>{tag.nome}</strong>
+                      <small>{tag.posts.toLocaleString("pt-BR")} posts</small>
+                    </a>
+                  ))}
+                </div>
+              </section>
+
+              <section className="explorar-card">
+                <div className="explorar-card-header">
+                  <span>Sua Rede</span>
+                  <strong>Colegas de Trabalho</strong>
+                </div>
+
+                <div className="colegas-list" style={{ display: 'grid', gap: '10px' }}>
+                  {colegas.length > 0 ? (
+                    colegas.map((colega) => {
+                      const iniciais = colega.nomecompleto
+                        .split(" ")
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase();
+
+                      return (
+                        <a 
+                          className="trend-item colega-item" 
+                          href={`/perfil/${colega.id}`} 
+                          key={colega.id}
+                          style={{ gridTemplateColumns: '42px 1fr' }}
+                        >
+                          <div 
+                            className="avatar" 
+                            style={{ 
+                              width: '36px', 
+                              height: '36px', 
+                              fontSize: '14px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              borderRadius: '50%',
+                              backgroundColor: '#0891B2',
+                              color: '#ffffff',
+                              fontWeight: '700',
+                              border: 'none',
+                              boxShadow: 'none',
+                              margin: 0
+                            }}
+                          >
+                            {colega.avatarUrl ? (
+                              <img 
+                                src={colega.avatarUrl} 
+                                alt={colega.nomecompleto} 
+                                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                              />
+                            ) : (
+                              iniciais || "HT"
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <strong style={{ fontSize: '0.95rem' }}>{colega.nomecompleto}</strong>
+                            <small style={{ color: 'var(--color-muted)', alignSelf: 'flex-start' }}>
+                              {colega.cargo_responsavel || "Colaborador"}
+                            </small>
+                          </div>
+                        </a>
+                      );
+                    })
+                  ) : (
+                    <p style={{ color: 'var(--color-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '16px' }}>
+                      Nenhum colega de trabalho encontrado.
+                    </p>
+                  )}
+                </div>
+              </section>
+            </div>
           </section>
         </main>
       </div>

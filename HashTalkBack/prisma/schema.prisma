@@ -21,6 +21,8 @@ model Usuario {
   cargo_responsavel String?  @db.VarChar(255)
   nome_empresa      String?  @db.VarChar(255)
   criado_em         DateTime @default(now()) @db.Timestamptz()
+  avatar_url        String?  @db.Text
+  capa_url          String?  @db.Text
   
   // Chave estrangeira (Autorelacionamento)
   // O ID da empresa à qual o funcionário pertence
@@ -31,6 +33,14 @@ model Usuario {
   // Relação com os posts
   posts             Post[]
 
+  // Relações de mensagens
+  sent_messages     Message[] @relation("SentMessages")
+  received_messages Message[] @relation("ReceivedMessages")
+
+  // Curtidas e Comentários
+  comments          Comment[]
+  likes             Like[]
+
   // Nome exato da tabela no banco
   @@map("usuarios") 
 }
@@ -39,11 +49,57 @@ model Post {
   id        Int      @id @default(autoincrement())
   content   String   @db.Text
   hashtags  String[] @db.VarChar(100)
+  image_url String?  @db.Text
   created_at DateTime @default(now()) @db.Timestamptz()
 
   // Chave estrangeira (Foreign Key) para usuario
   usuario_id Int
   usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
 
+  // Curtidas e Comentários
+  comments          Comment[]
+  likes             Like[]
+
   @@map("posts")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  sender_id  Int
+  receiver_id Int
+  content    String   @db.Text
+  created_at DateTime @default(now()) @db.Timestamptz()
+
+  sender    Usuario @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver  Usuario @relation("ReceivedMessages", fields: [receiver_id], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  content    String   @db.Text
+  created_at DateTime @default(now()) @db.Timestamptz()
+
+  post_id    Int
+  usuario_id Int
+
+  post       Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  usuario    Usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz()
+
+  post_id    Int
+  usuario_id Int
+
+  post       Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  usuario    Usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, usuario_id])
+  @@map("likes")
 }

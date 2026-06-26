@@ -144,6 +144,41 @@ class AuthController {
             message: 'Logout realizado com sucesso'
         });
     }
+
+    async updateMe(req, res) {
+        try {
+            const { avatarUrl, capaUrl, nomecompleto, cargoFuncionario, nomeEmpresa } = req.body;
+            const updateData = {};
+            
+            if (avatarUrl !== undefined) updateData.avatar_url = avatarUrl;
+            if (capaUrl !== undefined) updateData.capa_url = capaUrl;
+            if (nomecompleto !== undefined) updateData.nomecompleto = nomecompleto;
+            if (cargoFuncionario !== undefined) updateData.cargo_responsavel = cargoFuncionario;
+            if (nomeEmpresa !== undefined) updateData.nome_empresa = nomeEmpresa;
+
+            const updated = await userService.updateUser(req.user.id, updateData);
+            res.json({
+                message: 'Perfil atualizado com sucesso',
+                usuario: updated
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar perfil:', error);
+            res.status(500).json({ error: 'Erro interno ao atualizar perfil' });
+        }
+    }
+
+    async getMe(req, res) {
+        try {
+            const user = await userService.findUserById(req.user.id);
+            res.json({
+                message: 'Usuário autenticado',
+                usuario: user
+            });
+        } catch (error) {
+            console.error('Erro ao buscar dados do usuário:', error);
+            res.status(500).json({ error: 'Erro interno ao buscar dados do usuário' });
+        }
+    }
 }
 
 module.exports = new AuthController();

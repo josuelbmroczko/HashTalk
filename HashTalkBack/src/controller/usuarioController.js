@@ -49,11 +49,15 @@ const cadastrarUsuario = async (req, res) => {
 
 const listarUsuarios = async (req, res) => {
     try {
+        const loggedUserId = parseInt(req.user.id);
         const usuarios = await prisma.usuario.findMany({
+            where: {
+                id: { not: loggedUserId }
+            },
             select: {
                 id: true, nomecompleto: true, username: true, email: true,
                 role: true, cargo_responsavel: true, nome_empresa: true,
-                empresa_id: true, criado_em: true
+                empresa_id: true, criado_em: true, avatar_url: true
             }
         });
         res.json(usuarios);
@@ -110,7 +114,7 @@ const getPerfilUsuario = async (req, res) => {
             select: {
                 id: true, nomecompleto: true, username: true, email: true,
                 role: true, cargo_responsavel: true, nome_empresa: true,
-                criado_em: true
+                criado_em: true, avatar_url: true, capa_url: true
             }
         });
 
@@ -131,10 +135,98 @@ const getPerfilUsuario = async (req, res) => {
     }
 };
 
+const listarColegas = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user.id);
+        
+        // 1. Busca o usuário logado para obter o contexto de empresa
+        const me = await prisma.usuario.findUnique({
+            where: { id: loggedUserId }
+        });
+
+        if (!me) {
+            return res.status(404).json({ error: 'Usuário logado não encontrado.' });
+        }
+
+        const targetCompanyId = me.empresa_id || me.id;
+
+        // 2. Busca outros usuários pertencentes a essa mesma empresa
+        const colegas = await prisma.usuario.findMany({
+            where: {
+                AND: [
+                    {
+                        OR: [
+                            { empresa_id: targetCompanyId },
+                            { id: targetCompanyId }
+                        ]
+                    },
+                    { id: { not: loggedUserId } } // Excluir a si mesmo
+                ]
+            },
+            select: {
+                id: true,
+                nomecompleto: true,
+                username: true,
+                email: true,
+                role: true,
+                cargo_responsavel: true,
+                nome_empresa: true,
+                avatar_url: true,
+                capa_url: true
+            }
+        });
+
+        res.json({ total: colegas.length, colegas });
+    } catch (error) {
+        console.error('Erro ao listar colegas:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar colegas de trabalho.' });
+    }
+};
+
+const buscarUsuarios = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) {
+            return res.json([]);
+        }
+        const loggedUserId = parseInt(req.user.id);
+        const users = await prisma.usuario.findMany({
+            where: {
+                AND: [
+                    { id: { not: loggedUserId } },
+                    {
+                        OR: [
+                            { nomecompleto: { contains: q, mode: 'insensitive' } },
+                            { username: { contains: q, mode: 'insensitive' } },
+                            { email: { contains: q, mode: 'insensitive' } }
+                        ]
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                nomecompleto: true,
+                username: true,
+                email: true,
+                avatar_url: true,
+                nome_empresa: true,
+                role: true
+            },
+            take: 20
+        });
+        res.json(users);
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
+    }
+};
+
 module.exports = {
     cadastrarUsuario,
     listarUsuarios,
     listarFuncionarios,
     listarEmpresas,
-    getPerfilUsuario // Exportação atualizada
+    getPerfilUsuario,
+    listarColegas,
+    buscarUsuarios
 };

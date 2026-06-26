@@ -10,7 +10,29 @@ const postInclude = {
             email: true,
             role: true,
             nome_empresa: true,
-            empresa_id: true
+            empresa_id: true,
+            avatar_url: true
+        }
+    },
+    comments: {
+        include: {
+            usuario: {
+                select: {
+                    id: true,
+                    nomecompleto: true,
+                    username: true,
+                    avatar_url: true,
+                    nome_empresa: true
+                }
+            }
+        },
+        orderBy: {
+            created_at: 'asc'
+        }
+    },
+    likes: {
+        select: {
+            usuario_id: true
         }
     }
 };
@@ -34,7 +56,7 @@ const getAllPosts = async (req, res) => {
 
 const createPost = async (req, res) => {
     try {
-        const { content, usuario_id } = req.body;
+        const { content, usuario_id, image_url } = req.body;
         const usuarioId = req.userInfo?.id || usuario_id;
 
         if (!content) {
@@ -65,6 +87,7 @@ const createPost = async (req, res) => {
             data: {
                 content,
                 hashtags,
+                image_url,
                 usuario_id: parseInt(usuarioId)
             },
             include: postInclude
@@ -229,6 +252,126 @@ const deletePost = async (req, res) => {
     }
 };
 
+const getPostsColegas = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.userInfo?.id || req.user?.id);
+        
+        const me = await prisma.usuario.findUnique({
+            where: { id: loggedUserId }
+        });
+
+        if (!me) {
+            return res.status(404).json({ error: 'Usuário logado não encontrado.' });
+        }
+
+        const targetCompanyId = me.empresa_id || me.id;
+
+        const posts = await prisma.post.findMany({
+            where: {
+                usuario: {
+                    OR: [
+                        { empresa_id: targetCompanyId },
+                        { id: targetCompanyId }
+                    ]
+                }
+            },
+            include: postInclude,
+            orderBy: { created_at: 'desc' }
+        });
+
+        res.json({
+            total: posts.length,
+            posts
+        });
+    } catch (error) {
+        console.error('Erro ao buscar posts de colegas:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar posts de colegas.' });
+    }
+};
+
+const likePost = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user?.id || req.userInfo?.id);
+        const postId = parseInt(req.params.id);
+
+        if (isNaN(postId)) {
+            return res.status(400).json({ error: 'ID do post inválido.' });
+        }
+
+        // Check if already liked
+        const existingLike = await prisma.like.findUnique({
+            where: {
+                post_id_usuario_id: {
+                    post_id: postId,
+                    usuario_id: loggedUserId
+                }
+            }
+        });
+
+        if (existingLike) {
+            // Unlike
+            await prisma.like.delete({
+                where: {
+                    id: existingLike.id
+                }
+            });
+            return res.json({ liked: false });
+        } else {
+            // Like
+            await prisma.like.create({
+                data: {
+                    post_id: postId,
+                    usuario_id: loggedUserId
+                }
+            });
+            return res.status(201).json({ liked: true });
+        }
+    } catch (error) {
+        console.error('Erro ao curtir postagem:', error);
+        res.status(500).json({ error: 'Erro interno ao curtir postagem.' });
+    }
+};
+
+const commentPost = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.user?.id || req.userInfo?.id);
+        const postId = parseInt(req.params.id);
+        const { content } = req.body;
+
+        if (isNaN(postId)) {
+            return res.status(400).json({ error: 'ID do post inválido.' });
+        }
+
+        if (!content || content.trim() === '') {
+            return res.status(400).json({ error: 'Conteúdo do comentário é obrigatório.' });
+        }
+
+        const comment = await prisma.comment.create({
+            data: {
+                content: content.trim(),
+                post_id: postId,
+                usuario_id: loggedUserId
+            },
+            include: {
+                usuario: {
+                    select: {
+                        id: true,
+                        nomecompleto: true,
+                        username: true,
+                        avatar_url: true,
+                        nome_empresa: true
+                    }
+                }
+            }
+        });
+
+        res.status(201).json(comment);
+    } catch (error) {
+        console.error('Erro ao comentar postagem:', error);
+        res.status(500).json({ error: 'Erro interno ao comentar postagem.' });
+    }
+};
+
 module.exports = {
     getAllPosts,
     createPost,
@@ -237,5 +380,8 @@ module.exports = {
     getPostsByEmpresa,
     getPostsByEmpresaNome,
     getPostsByHashtag,
-    deletePost
+    deletePost,
+    getPostsColegas,
+    likePost,
+    commentPost
 };

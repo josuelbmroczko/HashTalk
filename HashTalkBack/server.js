@@ -5,18 +5,23 @@ const cors = require('cors');
 const authRoutes = require('./src/routes/authRoutes');
 const postRoutes = require('./src/routes/postRoutes');
 const hashtagRoutes = require('./src/routes/hashtagRoutes');
+const usuarioRoutes = require('./src/routes/usuarioRoutes');
+const messageRoutes = require('./src/routes/messageRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/hashtags', hashtagRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Rota de saúde
 app.get('/health', (req, res) => {

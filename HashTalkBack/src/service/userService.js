@@ -14,7 +14,9 @@ const toPublicUser = (usuario) => {
         cargoFuncionario: usuario.cargo_responsavel,
         emailInstitucional: usuario.email,
         username: usuario.username,
-        role: usuario.role
+        role: usuario.role,
+        avatarUrl: usuario.avatar_url,
+        capaUrl: usuario.capa_url
     };
 };
 
@@ -30,6 +32,15 @@ class UserService {
     async findUserById(id) {
         const usuario = await prisma.usuario.findUnique({
             where: { id: parseInt(id) }
+        });
+
+        return toPublicUser(usuario);
+    }
+
+    async updateUser(id, updateData) {
+        const usuario = await prisma.usuario.update({
+            where: { id: parseInt(id) },
+            data: updateData
         });
 
         return toPublicUser(usuario);

@@ -301,3 +301,129 @@
     padding-top: 12px;
   }
 }
+
+/* Modal de Edição de Perfil */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  width: min(100%, 540px);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: #0F172A;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  cursor: pointer;
+  color: #64748B;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #0F172A;
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  color: #0F172A;
+  background-color: #F8FAFC;
+  transition: border-color 0.2s;
+}
+
+.form-group input[type="text"]:focus {
+  border-color: #0891B2;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #F8FAFC;
+}
+
+.btn-cancelar {
+  padding: 10px 20px;
+  background: none;
+  border: 1px solid #CBD5E1;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.btn-cancelar:hover {
+  background-color: #F1F5F9;
+}
+
+.btn-salvar {
+  padding: 10px 20px;
+  background-color: #0891B2;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #ffffff;
+  transition: all 0.2s;
+}
+
+.btn-salvar:hover {
+  background-color: #0e7490;
+}
