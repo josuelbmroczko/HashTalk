@@ -23,6 +23,7 @@ function App() {
       <Route path="/postagem" element={<Postagem />} />
       <Route path="/home" element={<Home />} />
       <Route path="/perfil" element={<Perfil />} />
+      <Route path="/perfil/:id" element={<Perfil />} />
       <Route path="/hashtag/:hashtag" element={<Hashtag />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
       <Route path="/minhaempresa" element={<MinhaEmpresa />} />
