@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-
 import Home from "./pages/Home/Home";
 import Postagem from "./pages/Postagem/Postagem";
 import SplashPage from "./pages/Splash/SplashPage";
@@ -9,6 +8,11 @@ import Cadastro from "./pages/Cadastro/Cadastro";
 import Perfil from "./pages/Perfil/Perfil";
 import Hashtag from "./pages/Hashtag/Hashtag";
 import Configuracoes from "./pages/Configuracoes/Configuracoes";
+import MinhaEmpresa from "./pages/MinhaEmpresa/minhaEmpresa";
+import Parceiros from "./pages/Parceiros/parceiros";
+import Pesquisa from "./pages/Buscar/Pesquisa";
+import Mensagens from "./pages/Mensagens/Mensagens";
+
 function App() {
 
   return (
@@ -21,6 +25,11 @@ function App() {
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/hashtag/:hashtag" element={<Hashtag />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
+      <Route path="/minhaempresa" element={<MinhaEmpresa />} />
+      <Route path="/parceiros" element={<Parceiros />} />
+      <Route path="/explorar" element={<Pesquisa />} />
+      <Route path="/mensagens" element={<Mensagens />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
   <>
