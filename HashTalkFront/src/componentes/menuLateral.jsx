@@ -76,8 +76,8 @@ export default function MenuLateral() {
         </button>
 
         <div className="menu-brand">
-          {userInfo?.avatarUrl ? (
-            <img src={userInfo.avatarUrl} alt={userInfo.nomeEmpresa || "User Avatar"} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+          {userInfo?.avatar_url || userInfo?.avatarUrl ? (
+            <img src={userInfo.avatar_url || userInfo.avatarUrl} alt={userInfo.nomeEmpresa || "User Avatar"} style={{ borderRadius: '50%', objectFit: 'cover' }} />
           ) : (
             <img src={logo} alt="HashTalk" />
           )}

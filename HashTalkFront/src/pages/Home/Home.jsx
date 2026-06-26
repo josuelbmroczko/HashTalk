@@ -167,8 +167,8 @@ export default function Home() {
                     <div className="post-author">
                       <Link to={`/perfil/${post.usuario?.id}`} style={{ textDecoration: "none", color: "inherit", display: "flex", gap: "12px", alignItems: "center" }}>
                         <div className="post-avatar">
-                          {post.usuario?.avatarUrl ? (
-                            <img src={post.usuario.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                          {post.usuario?.avatar_url || post.usuario?.avatarUrl ? (
+                            <img src={post.usuario.avatar_url || post.usuario.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                           ) : (
                             getInitials(authorName) || "HT"
                           )}

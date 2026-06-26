@@ -133,9 +133,9 @@ function Pesquisa() {
                               margin: 0
                             }}
                           >
-                            {colega.avatarUrl ? (
+                            {colega.avatar_url || colega.avatarUrl ? (
                               <img 
-                                src={colega.avatarUrl} 
+                                src={colega.avatar_url || colega.avatarUrl} 
                                 alt={colega.nomecompleto} 
                                 style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
                               />

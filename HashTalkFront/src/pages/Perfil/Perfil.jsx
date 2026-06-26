@@ -188,8 +188,8 @@ function Perfil() {
 
             <div className="perfil-info">
               <div className="avatar">
-                {userInfo?.avatarUrl ? (
-                  <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                {userInfo?.avatar_url || userInfo?.avatarUrl ? (
+                  <img src={userInfo.avatar_url || userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 ) : (
                   iniciais || "HT"
                 )}
@@ -241,8 +241,8 @@ function Perfil() {
                   <article className="post-card" key={post.id}>
                     <div className="post-card-header">
                       <div className="avatar post-mini-avatar">
-                        {userInfo?.avatarUrl ? (
-                          <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                        {userInfo?.avatar_url || userInfo?.avatarUrl ? (
+                          <img src={userInfo.avatar_url || userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                         ) : (
                           iniciais || "HT"
                         )}
@@ -282,8 +282,8 @@ function Perfil() {
                     </div>
                     <div className="post-card-header">
                       <div className="avatar post-mini-avatar">
-                        {userInfo?.avatarUrl ? (
-                          <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                        {userInfo?.avatar_url || userInfo?.avatarUrl ? (
+                          <img src={userInfo.avatar_url || userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                         ) : (
                           iniciais || "HT"
                         )}
