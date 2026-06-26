@@ -12,15 +12,15 @@ function Pesquisa() {
     const fetchColegas = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`${API_URL}/api/usuarios/colegas`, {
+        const response = await fetch(`${API_URL}/api/usuarios`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
           const data = await response.json();
-          setColegas(data.colegas || []);
+          setColegas(data || []);
         }
       } catch (err) {
-        console.error("Erro ao carregar colegas:", err);
+        console.error("Erro ao carregar usuários:", err);
       }
     };
     fetchColegas();
@@ -94,7 +94,7 @@ function Pesquisa() {
               <section className="explorar-card">
                 <div className="explorar-card-header">
                   <span>Sua Rede</span>
-                  <strong>Colegas de Trabalho</strong>
+                  <strong>Comunidade (Todos os Usuários)</strong>
                 </div>
 
                 <div className="colegas-list" style={{ display: 'grid', gap: '10px' }}>
@@ -154,7 +154,7 @@ function Pesquisa() {
                     })
                   ) : (
                     <p style={{ color: 'var(--color-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '16px' }}>
-                      Nenhum colega de trabalho encontrado.
+                      Nenhum usuário encontrado.
                     </p>
                   )}
                 </div>
