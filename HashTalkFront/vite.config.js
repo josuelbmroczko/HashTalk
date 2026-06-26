@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://sol-brother-solution-developing.trycloudflare.com',
+        target: 'https://documentation-classical-vienna-pam.trycloudflare.com',
         changeOrigin: true,
         headers: {
           'Bypass-Tunnel-Reminder': 'true'
