@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaEnvelope, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import MenuLateral from "../../componentes/menuLateral";
@@ -46,7 +46,6 @@ const withAvatarStyle = (usuario) => {
 
 export default function Parceiros() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
   const [abaAtiva, setAbaAtiva] = useState(0);
   const [busca, setBusca] = useState("");
   const [usuarios, setUsuarios] = useState([]);
@@ -58,36 +57,55 @@ export default function Parceiros() {
   const [erro, setErro] = useState("");
   const [followLoading, setFollowLoading] = useState(null);
 
-  const carregarParceiros = async () => {
-    if (!token) return;
+  const carregarParceiros = useCallback(async ({ silent = false } = {}) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      if (!silent) setLoading(true);
       setErro("");
-      const usuariosRes = await fetch(`${API_URL}/api/usuarios`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      if (!usuariosRes.ok) {
+      const [usuariosRes, relacionamentosRes] = await Promise.all([
+        fetch(`${API_URL}/api/usuarios`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`${API_URL}/api/usuarios/relacionamentos`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      if (!usuariosRes.ok || !relacionamentosRes.ok) {
         throw new Error("Nao foi possivel carregar parceiros.");
       }
 
-      const usuariosData = await usuariosRes.json();
-      const followingFromUsers = usuariosData.filter((usuario) => usuario.isFollowing);
-      const followersList = [];
-      const suggestionsList = usuariosData.filter((usuario) => !usuario.isFollowing);
-      const followingIds = new Set(followingFromUsers.map((usuario) => usuario.id));
+      const [usuariosData, relacionamentosData] = await Promise.all([
+        usuariosRes.json(),
+        relacionamentosRes.json(),
+      ]);
+
+      const followingFromApi = relacionamentosData.following || [];
+      const followersFromApi = relacionamentosData.followers || [];
+      const suggestionsFromApi = relacionamentosData.suggestions || [];
+      const followingIds = new Set(followingFromApi.map((usuario) => usuario.id));
 
       setUsuarios(usuariosData.map((usuario) => withAvatarStyle({
         ...usuario,
-        isFollowing: usuario.isFollowing || followingIds.has(usuario.id),
+        isFollowing: followingIds.has(usuario.id),
       })));
-      setSeguindo(followingFromUsers.map(withAvatarStyle));
-      setSeguidores(followersList.map(withAvatarStyle));
-      setSugestoes(suggestionsList.map(withAvatarStyle));
+      setSeguindo(followingFromApi.map((usuario) => withAvatarStyle({ ...usuario, isFollowing: true })));
+      setSeguidores(followersFromApi.map(withAvatarStyle));
+      setSugestoes(
+        suggestionsFromApi
+          .filter((usuario) => !followingIds.has(usuario.id))
+          .map((usuario) => withAvatarStyle({ ...usuario, isFollowing: false }))
+      );
       setCounts({
-        following: followingFromUsers.length,
-        followers: followersList.length,
-        suggestions: suggestionsList.length,
+        following: relacionamentosData.counts?.following ?? followingFromApi.length,
+        followers: relacionamentosData.counts?.followers ?? followersFromApi.length,
+        suggestions: relacionamentosData.counts?.suggestions ?? suggestionsFromApi.length,
       });
     } catch (error) {
       console.error("Erro ao carregar parceiros:", error);
@@ -95,11 +113,11 @@ export default function Parceiros() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     carregarParceiros();
-  }, [token]);
+  }, [carregarParceiros]);
 
   const listaAtiva = useMemo(() => {
     if (abaAtiva === 1) return seguindo;
@@ -123,6 +141,11 @@ export default function Parceiros() {
 
     setFollowLoading(usuarioId);
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Voce precisa estar logado para seguir parceiros.");
+      }
+
       const res = await fetch(`${API_URL}/api/usuarios/${usuarioId}/follow`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -179,9 +202,11 @@ export default function Parceiros() {
 
       setCounts((prev) => ({
         ...prev,
-        following: Math.max(0, (prev.following || 0) + (isFollowing ? 1 : -1)),
+        following: data.totalSeguindo ?? Math.max(0, (prev.following || 0) + (isFollowing ? 1 : -1)),
         suggestions: Math.max(0, (prev.suggestions || 0) + (isFollowing ? -1 : 1)),
       }));
+
+      await carregarParceiros({ silent: true });
     } catch (error) {
       console.error("Erro ao seguir parceiro:", error);
       setErro(error.message || "Erro ao seguir parceiro.");
