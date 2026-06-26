@@ -10,6 +10,7 @@ router.use(authMiddleware.extractUserInfo);
 // Rotas de posts
 router.get('/', postController.getAllPosts);
 router.post('/', postController.createPost);
+router.get('/colegas', postController.getPostsColegas);
 router.get('/usuario/:id', postController.getPostsByUsuario);
 router.get('/me', postController.getMyPosts);
 router.get('/empresa/:empresaId', postController.getPostsByEmpresa);

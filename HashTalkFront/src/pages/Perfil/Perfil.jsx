@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { FaRegComment, FaRegHeart } from "react-icons/fa6";
 import MenuLateral from "../../componentes/menuLateral";
 import { API_URL } from "../../config/api";
@@ -76,11 +77,16 @@ function Perfil() {
     }
   };
 
+  const { id } = useParams();
+  const loggedInUser = JSON.parse(localStorage.getItem("usuario"));
+  const isOwnProfile = !id || parseInt(id) === loggedInUser?.id;
+
   useEffect(() => {
     const carregarPerfil = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`${API_URL}/api/auth/me`, {
+        const endpoint = id ? `${API_URL}/api/usuarios/${id}` : `${API_URL}/api/auth/me`;
+        const response = await fetch(endpoint, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -88,7 +94,7 @@ function Perfil() {
         const data = await response.json();
 
         if (response.ok) {
-          setUserInfo(data.usuario);
+          setUserInfo(data.usuario || data);
         }
       } catch (error) {
         console.error("Erro ao buscar dados do usuario:", error);
@@ -98,7 +104,8 @@ function Perfil() {
     const carregarPosts = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`${API_URL}/api/posts/me`, {
+        const endpoint = id ? `${API_URL}/api/posts/usuario/${id}` : `${API_URL}/api/posts/me`;
+        const response = await fetch(endpoint, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -109,7 +116,7 @@ function Perfil() {
           setPosts(data.posts || []);
         }
       } catch (error) {
-        console.error("Erro ao buscar meus posts:", error);
+        console.error("Erro ao buscar posts:", error);
       } finally {
         setLoading(false);
       }
@@ -117,7 +124,7 @@ function Perfil() {
 
     carregarPerfil();
     carregarPosts();
-  }, []);
+  }, [id]);
 
   const nomePerfil =
     userInfo?.nomeEmpresa ||
@@ -159,7 +166,9 @@ function Perfil() {
                   iniciais || "HT"
                 )}
               </div>
-              <button type="button" className="editar-perfil" onClick={abrirModal}>Editar perfil</button>
+              {isOwnProfile && (
+                <button type="button" className="editar-perfil" onClick={abrirModal}>Editar perfil</button>
+              )}
 
               <div className="perfil-identidade">
                 <h1>{nomePerfil}</h1>

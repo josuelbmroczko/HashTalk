@@ -276,7 +276,9 @@ export default function Postagem() {
             ) : posts.length > 0 ? (
               posts.map((post) => (
                 <article className="post" key={post.id}>
-                  <strong>{post.usuario?.nome_empresa || post.usuario?.nomecompleto || 'Usuario'}</strong>
+                  <Link to={`/perfil/${post.usuario?.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <strong>{post.usuario?.nome_empresa || post.usuario?.nomecompleto || 'Usuario'}</strong>
+                  </Link>
                   <p>{post.content}</p>
 
                   {post.image_url && (

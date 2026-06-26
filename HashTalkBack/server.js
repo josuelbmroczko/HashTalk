@@ -5,6 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./src/routes/authRoutes');
 const postRoutes = require('./src/routes/postRoutes');
 const hashtagRoutes = require('./src/routes/hashtagRoutes');
+const usuarioRoutes = require('./src/routes/usuarioRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/hashtags', hashtagRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 
 // Rota de saúde
 app.get('/health', (req, res) => {

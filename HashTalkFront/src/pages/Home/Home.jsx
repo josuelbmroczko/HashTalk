@@ -22,12 +22,14 @@ const getInitials = (name) =>
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [abaAtiva, setAbaAtiva] = useState("recentes");
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`${API_URL}/api/posts`, {
+        const endpoint = abaAtiva === "colegas" ? `${API_URL}/api/posts/colegas` : `${API_URL}/api/posts`;
+        const response = await fetch(endpoint, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -50,7 +52,7 @@ export default function Home() {
     const intervalo = setInterval(fetchPosts, 5000);
 
     return () => clearInterval(intervalo);
-  }, []);
+  }, [abaAtiva]);
 
   return (
     <div className="app-container">
@@ -67,8 +69,8 @@ export default function Home() {
             </div>
 
             <div className="tabs" aria-label="Filtro do feed">
-              <span className="tab active">Recentes</span>
-              <span className="tab">Seguindo</span>
+              <span className={`tab ${abaAtiva === "recentes" ? "active" : ""}`} onClick={() => setAbaAtiva("recentes")}>Recentes</span>
+              <span className={`tab ${abaAtiva === "colegas" ? "active" : ""}`} onClick={() => setAbaAtiva("colegas")}>Colegas</span>
             </div>
           </header>
 
@@ -82,13 +84,19 @@ export default function Home() {
                 return (
                   <article className="post" key={post.id}>
                     <div className="post-author">
-                      <div className="post-avatar">
-                        {getInitials(authorName) || "HT"}
-                      </div>
-                      <div>
-                        <strong>{authorName}</strong>
-                        <p className="post-meta">Publicado agora</p>
-                      </div>
+                      <Link to={`/perfil/${post.usuario?.id}`} style={{ textDecoration: "none", color: "inherit", display: "flex", gap: "12px", alignItems: "center" }}>
+                        <div className="post-avatar">
+                          {post.usuario?.avatarUrl ? (
+                            <img src={post.usuario.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                          ) : (
+                            getInitials(authorName) || "HT"
+                          )}
+                        </div>
+                        <div>
+                          <strong>{authorName}</strong>
+                          <p className="post-meta">Publicado por {post.usuario?.role === 'EMPRESA' ? 'Empresa' : 'Funcionário'}</p>
+                        </div>
+                      </Link>
                     </div>
 
                     <p className="post-content">{post.content}</p>

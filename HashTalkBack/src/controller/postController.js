@@ -230,6 +230,43 @@ const deletePost = async (req, res) => {
     }
 };
 
+const getPostsColegas = async (req, res) => {
+    try {
+        const loggedUserId = parseInt(req.userInfo?.id || req.user?.id);
+        
+        const me = await prisma.usuario.findUnique({
+            where: { id: loggedUserId }
+        });
+
+        if (!me) {
+            return res.status(404).json({ error: 'Usuário logado não encontrado.' });
+        }
+
+        const targetCompanyId = me.empresa_id || me.id;
+
+        const posts = await prisma.post.findMany({
+            where: {
+                usuario: {
+                    OR: [
+                        { empresa_id: targetCompanyId },
+                        { id: targetCompanyId }
+                    ]
+                }
+            },
+            include: postInclude,
+            orderBy: { created_at: 'desc' }
+        });
+
+        res.json({
+            total: posts.length,
+            posts
+        });
+    } catch (error) {
+        console.error('Erro ao buscar posts de colegas:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar posts de colegas.' });
+    }
+};
+
 module.exports = {
     getAllPosts,
     createPost,
@@ -238,5 +275,6 @@ module.exports = {
     getPostsByEmpresa,
     getPostsByEmpresaNome,
     getPostsByHashtag,
-    deletePost
+    deletePost,
+    getPostsColegas
 };
