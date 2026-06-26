@@ -74,7 +74,7 @@ class AuthController {
                 });
             }
 
-            res.status(500).json({ error: 'Erro ao criar usuario' });
+            res.status(500).json({ error: 'Erro ao criar usuario', details: error.message });
         }
     }
 
