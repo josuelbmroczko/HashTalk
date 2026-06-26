@@ -10,6 +10,7 @@ import Perfil from "./pages/Perfil/Perfil";
 import Hashtag from "./pages/Hashtag/Hashtag";
 import Configuracoes from "./pages/Configuracoes/Configuracoes";
 import MinhaEmpresa from "./pages/MinhaEmpresa/minhaEmpresa";
+import Parceiros from "./pages/Parceiros/parceiros";
 import Pesquisa from "./pages/Buscar/Pesquisa";
 import Mensagens from "./pages/Mensagens/Mensagens";
 
@@ -25,6 +26,7 @@ function App() {
       <Route path="/hashtag/:hashtag" element={<Hashtag />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
       <Route path="/minhaempresa" element={<MinhaEmpresa />} />
+      <Route path="/parceiros" element={<Parceiros />} />
       <Route path="/explorar" element={<Pesquisa />} />
       <Route path="/mensagens" element={<Mensagens />} />
       <Route path="*" element={<Navigate to="/home" replace />} />

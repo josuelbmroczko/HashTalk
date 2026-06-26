@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaBell, FaCog, FaEnvelope, FaHome, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { FaBell, FaCog, FaEnvelope, FaHome, FaSignOutAlt, FaUser, FaHandshake } from "react-icons/fa";
 import { FaBars, FaPlus, FaXmark } from "react-icons/fa6";
 import { IoIosBusiness } from "react-icons/io";
 import { MdExplore } from "react-icons/md";
@@ -13,6 +13,7 @@ const navItems = [
   { to: "/explorar", label: "Explorar", icon: MdExplore },
   { to: "/notificacoes", label: "Notificacoes", icon: FaBell, disabled: true },
   { to: "/minhaempresa", label: "Minha empresa", icon: IoIosBusiness },
+  { to: "/parceiros", label: "Parceiros", icon: FaHandshake },
   { to: "/mensagens", label: "Mensagens", icon: FaEnvelope },
   { to: "/perfil", label: "Perfil", icon: FaUser },
   { to: "/configuracoes", label: "Configuracoes", icon: FaCog },
