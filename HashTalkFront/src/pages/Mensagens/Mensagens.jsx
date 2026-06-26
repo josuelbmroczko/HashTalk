@@ -27,7 +27,7 @@ export default function Mensagens() {
   const [sending, setSending] = useState(false);
 
   const messagesEndRef = useRef(null);
-  const loggedUser = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const loggedUser = JSON.parse(localStorage.getItem("usuario") || "{}") || {};
   const token = localStorage.getItem("token");
 
   // Fetch active conversations

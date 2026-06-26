@@ -100,7 +100,7 @@ function Pesquisa() {
                 <div className="colegas-list" style={{ display: 'grid', gap: '10px' }}>
                   {colegas.length > 0 ? (
                     colegas.map((colega) => {
-                      const iniciais = colega.nomecompleto
+                      const iniciais = (colega.nomecompleto || "Usuário")
                         .split(" ")
                         .filter(Boolean)
                         .slice(0, 2)
