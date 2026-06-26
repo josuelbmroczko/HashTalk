@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { FaRegComment, FaRegHeart } from "react-icons/fa6";
 import MenuLateral from "../../componentes/menuLateral";
 import { API_URL } from "../../config/api";
@@ -8,7 +8,10 @@ import "./Perfil.css";
 function Perfil() {
   const [userInfo, setUserInfo] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [likedPosts, setLikedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [abaAtiva, setAbaAtiva] = useState("posts");
 
   // Edit Profile States
   const [modalAberto, setModalAberto] = useState(false);
@@ -106,15 +109,10 @@ function Perfil() {
         const token = localStorage.getItem("token");
         const endpoint = id ? `${API_URL}/api/posts/usuario/${id}` : `${API_URL}/api/posts/me`;
         const response = await fetch(endpoint, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
-
-        if (response.ok) {
-          setPosts(data.posts || []);
-        }
+        if (response.ok) setPosts(data.posts || []);
       } catch (error) {
         console.error("Erro ao buscar posts:", error);
       } finally {
@@ -122,8 +120,38 @@ function Perfil() {
       }
     };
 
+    const carregarComentarios = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const endpoint = id ? `${API_URL}/api/posts/usuario/${id}/comments` : `${API_URL}/api/posts/me/comments`;
+        const response = await fetch(endpoint, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) setComments(data.comments || []);
+      } catch (error) {
+        console.error("Erro ao buscar comentários:", error);
+      }
+    };
+
+    const carregarCurtidas = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const endpoint = id ? `${API_URL}/api/posts/usuario/${id}/likes` : `${API_URL}/api/posts/me/likes`;
+        const response = await fetch(endpoint, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) setLikedPosts(data.posts || []);
+      } catch (error) {
+        console.error("Erro ao buscar curtidas:", error);
+      }
+    };
+
     carregarPerfil();
     carregarPosts();
+    carregarComentarios();
+    carregarCurtidas();
   }, [id]);
 
   const nomePerfil =
@@ -199,52 +227,123 @@ function Perfil() {
           </section>
 
           <div className="perfil-tabs">
-            <button type="button" className="tab-ativa">Posts</button>
-            <button type="button">Respostas</button>
-            <button type="button">Curtidas</button>
+            <button type="button" className={abaAtiva === "posts" ? "tab-ativa" : ""} onClick={() => setAbaAtiva("posts")}>Posts</button>
+            <button type="button" className={abaAtiva === "respostas" ? "tab-ativa" : ""} onClick={() => setAbaAtiva("respostas")}>Respostas</button>
+            <button type="button" className={abaAtiva === "curtidas" ? "tab-ativa" : ""} onClick={() => setAbaAtiva("curtidas")}>Curtidas</button>
           </div>
 
           <section className="feed perfil-feed">
             {loading ? (
-              <div className="loading-state">Carregando posts...</div>
-            ) : posts.length > 0 ? (
-              posts.map((post) => (
-                <article className="post-card" key={post.id}>
-                  <div className="post-card-header">
-                    <div className="avatar post-mini-avatar">
-                      {userInfo?.avatarUrl ? (
-                        <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                      ) : (
-                        iniciais || "HT"
-                      )}
+              <div className="loading-state">Carregando...</div>
+            ) : abaAtiva === "posts" ? (
+              posts.length > 0 ? (
+                posts.map((post) => (
+                  <article className="post-card" key={post.id}>
+                    <div className="post-card-header">
+                      <div className="avatar post-mini-avatar">
+                        {userInfo?.avatarUrl ? (
+                          <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          iniciais || "HT"
+                        )}
+                      </div>
+                      <div>
+                        <strong>{nomePerfil}</strong>
+                        <span>@{usuarioPerfil}</span>
+                      </div>
                     </div>
-                    <div>
-                      <strong>{nomePerfil}</strong>
-                      <span>@{usuarioPerfil}</span>
+                    <p>{post.content}</p>
+                    {post.image_url && (
+                      <div className="post-image-container">
+                        <img src={post.image_url} alt="Imagem do post" className="post-image" />
+                      </div>
+                    )}
+                    <div className="post-acoes">
+                      <span><FaRegHeart /> {post.likes?.length || 0}</span>
+                      <span><FaRegComment /> {post.comments?.length || 0}</span>
+                      <small>
+                        {post.created_at ? new Date(post.created_at).toLocaleDateString("pt-BR") : ""}
+                      </small>
                     </div>
-                  </div>
-
-                  <p>{post.content}</p>
-
-                  {post.image_url && (
-                    <div className="post-image-container">
-                      <img src={post.image_url} alt="Imagem do post" className="post-image" />
+                  </article>
+                ))
+              ) : (
+                <div className="empty-state">Nenhum post encontrado.</div>
+              )
+            ) : abaAtiva === "respostas" ? (
+              comments.length > 0 ? (
+                comments.map((comment) => (
+                  <article className="post-card" key={comment.id}>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '8px' }}>
+                      Em resposta ao post de <Link to={`/perfil/${comment.post?.usuario?.id}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>{comment.post?.usuario?.nome_empresa || comment.post?.usuario?.nomecompleto || 'Usuário'}</Link>
                     </div>
-                  )}
-
-                  <div className="post-acoes">
-                    <span><FaRegHeart /> 0</span>
-                    <span><FaRegComment /> 0</span>
-                    <small>
-                      {post.created_at
-                        ? new Date(post.created_at).toLocaleDateString("pt-BR")
-                        : ""}
-                    </small>
-                  </div>
-                </article>
-              ))
+                    <div style={{ backgroundColor: '#f1f5f9', padding: '10px 14px', borderRadius: '8px', marginBottom: '12px', fontSize: '0.85rem', color: '#475569', borderLeft: '3px solid #cbd5e1' }}>
+                      {comment.post?.content?.substring(0, 120)}{comment.post?.content?.length > 120 ? '...' : ''}
+                    </div>
+                    <div className="post-card-header">
+                      <div className="avatar post-mini-avatar">
+                        {userInfo?.avatarUrl ? (
+                          <img src={userInfo.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          iniciais || "HT"
+                        )}
+                      </div>
+                      <div>
+                        <strong>{nomePerfil}</strong>
+                        <span>@{usuarioPerfil}</span>
+                      </div>
+                    </div>
+                    <p>{comment.content}</p>
+                    <div className="post-acoes">
+                      <small>
+                        {comment.created_at ? new Date(comment.created_at).toLocaleDateString("pt-BR") : ""}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <div className="empty-state">Nenhuma resposta encontrada.</div>
+              )
             ) : (
-              <div className="empty-state">Nenhum post encontrado.</div>
+              likedPosts.length > 0 ? (
+                likedPosts.map((post) => {
+                  const postAuthor = post.usuario?.nome_empresa || post.usuario?.nomecompleto || 'Usuário';
+                  return (
+                    <article className="post-card" key={post.id}>
+                      <div className="post-card-header">
+                        <Link to={`/perfil/${post.usuario?.id}`} style={{ display: 'flex', gap: '12px', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+                          <div className="avatar post-mini-avatar">
+                            {post.usuario?.avatar_url ? (
+                              <img src={post.usuario.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                            ) : (
+                              postAuthor.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'HT'
+                            )}
+                          </div>
+                          <div>
+                            <strong>{postAuthor}</strong>
+                            <span>@{post.usuario?.username}</span>
+                          </div>
+                        </Link>
+                      </div>
+                      <p>{post.content}</p>
+                      {post.image_url && (
+                        <div className="post-image-container">
+                          <img src={post.image_url} alt="Imagem do post" className="post-image" />
+                        </div>
+                      )}
+                      <div className="post-acoes">
+                        <span style={{ color: '#ef4444' }}><FaRegHeart /> {post.likes?.length || 0}</span>
+                        <span><FaRegComment /> {post.comments?.length || 0}</span>
+                        <small>
+                          {post.created_at ? new Date(post.created_at).toLocaleDateString("pt-BR") : ""}
+                        </small>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <div className="empty-state">Nenhuma curtida encontrada.</div>
+              )
             )}
           </section>
         </main>

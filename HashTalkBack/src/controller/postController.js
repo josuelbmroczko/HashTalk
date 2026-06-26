@@ -372,6 +372,63 @@ const commentPost = async (req, res) => {
     }
 };
 
+const getCommentsByUsuario = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id || req.userInfo?.id);
+        const comments = await prisma.comment.findMany({
+            where: { usuario_id: userId },
+            include: {
+                post: {
+                    include: {
+                        usuario: {
+                            select: {
+                                id: true,
+                                nomecompleto: true,
+                                username: true,
+                                nome_empresa: true,
+                                avatar_url: true
+                            }
+                        }
+                    }
+                },
+                usuario: {
+                    select: {
+                        id: true,
+                        nomecompleto: true,
+                        username: true,
+                        avatar_url: true
+                    }
+                }
+            },
+            orderBy: { created_at: 'desc' }
+        });
+        res.json({ total: comments.length, comments });
+    } catch (error) {
+        console.error('Erro ao buscar comentários do usuário:', error);
+        res.status(500).json({ error: 'Erro ao buscar comentários.' });
+    }
+};
+
+const getLikedPostsByUsuario = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id || req.userInfo?.id);
+        const likes = await prisma.like.findMany({
+            where: { usuario_id: userId },
+            include: {
+                post: {
+                    include: postInclude
+                }
+            },
+            orderBy: { created_at: 'desc' }
+        });
+        const posts = likes.map(like => like.post);
+        res.json({ total: posts.length, posts });
+    } catch (error) {
+        console.error('Erro ao buscar posts curtidos:', error);
+        res.status(500).json({ error: 'Erro ao buscar posts curtidos.' });
+    }
+};
+
 module.exports = {
     getAllPosts,
     createPost,
@@ -383,5 +440,7 @@ module.exports = {
     deletePost,
     getPostsColegas,
     likePost,
-    commentPost
+    commentPost,
+    getCommentsByUsuario,
+    getLikedPostsByUsuario
 };
