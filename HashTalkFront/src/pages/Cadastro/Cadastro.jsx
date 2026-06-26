@@ -152,7 +152,7 @@ function Cadastro() {
             <div>
               <label>Senha</label>
               <input
-                type="password"
+                 type="password"
                 placeholder="Mín. 8 caracteres"
                 value={senha}
                 onChange={(event) => setSenha(event.target.value)}
