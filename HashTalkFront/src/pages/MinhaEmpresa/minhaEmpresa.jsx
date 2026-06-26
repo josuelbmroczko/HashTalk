@@ -8,9 +8,9 @@ function MinhaEmpresa() {
     return dados ? JSON.parse(dados) : null;
   });
 
-  const nomeEmpresa = usuario?.nomeEmpresa || "Minha empresa";
-  const responsavel = usuario?.nomeFuncionario || usuario?.nomecompleto || "Responsavel";
-  const cargo = usuario?.cargoFuncionario || "Cargo";
+  const nomeEmpresa = usuario?.nome_empresa || usuario?.nomeEmpresa || "Minha empresa";
+  const responsavel = usuario?.nomecompleto || usuario?.nomeFuncionario || "Responsável";
+  const cargo = usuario?.cargo_responsavel || usuario?.cargoFuncionario || "Cargo";
 
   return (
     <div className="app-container">
