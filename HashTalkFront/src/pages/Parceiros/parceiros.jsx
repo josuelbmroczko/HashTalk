@@ -56,6 +56,7 @@ export default function Parceiros() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
   const [followLoading, setFollowLoading] = useState(null);
+  const [followError, setFollowError] = useState(null);
 
   const carregarParceiros = useCallback(async ({ silent = false } = {}) => {
     const token = localStorage.getItem("token");
@@ -130,7 +131,56 @@ export default function Parceiros() {
   const toggleFollow = async (usuarioId) => {
     if (followLoading === usuarioId) return;
 
+    const parceiroAtual =
+      usuarios.find((usuario) => usuario.id === usuarioId) ||
+      sugestoes.find((usuario) => usuario.id === usuarioId) ||
+      seguindo.find((usuario) => usuario.id === usuarioId) ||
+      seguidores.find((usuario) => usuario.id === usuarioId);
+
+    if (!parceiroAtual) return;
+
+    const proximoEstado = !parceiroAtual.isFollowing;
+    const parceiroAtualizado = withAvatarStyle({
+      ...parceiroAtual,
+      isFollowing: proximoEstado,
+      totalSeguidores: Math.max(
+        0,
+        (parceiroAtual.totalSeguidores || 0) + (proximoEstado ? 1 : -1)
+      ),
+    });
+
+    setErro("");
+    setFollowError(null);
     setFollowLoading(usuarioId);
+
+    setUsuarios((prev) =>
+      prev.map((usuario) =>
+        usuario.id === usuarioId ? parceiroAtualizado : usuario
+      )
+    );
+
+    setSugestoes((prev) => {
+      const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+      return proximoEstado ? semParceiro : [parceiroAtualizado, ...semParceiro];
+    });
+
+    setSeguindo((prev) => {
+      const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+      return proximoEstado ? [parceiroAtualizado, ...semParceiro] : semParceiro;
+    });
+
+    setSeguidores((prev) =>
+      prev.map((usuario) =>
+        usuario.id === usuarioId ? { ...usuario, isFollowing: proximoEstado } : usuario
+      )
+    );
+
+    setCounts((prev) => ({
+      ...prev,
+      following: Math.max(0, (prev.following || 0) + (proximoEstado ? 1 : -1)),
+      suggestions: Math.max(0, (prev.suggestions || 0) + (proximoEstado ? -1 : 1)),
+    }));
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -149,40 +199,28 @@ export default function Parceiros() {
 
       const data = await res.json();
       const isFollowing = Boolean(data.following);
-      const parceiroAtual =
-        usuarios.find((usuario) => usuario.id === usuarioId) ||
-        sugestoes.find((usuario) => usuario.id === usuarioId) ||
-        seguindo.find((usuario) => usuario.id === usuarioId) ||
-        seguidores.find((usuario) => usuario.id === usuarioId);
-
-      const parceiroAtualizado = parceiroAtual
-        ? withAvatarStyle({
-            ...parceiroAtual,
-            isFollowing,
-            totalSeguidores: data.totalSeguidores ?? parceiroAtual.totalSeguidores,
-          })
-        : null;
+      const parceiroConfirmado = withAvatarStyle({
+        ...parceiroAtualizado,
+        isFollowing,
+        totalSeguidores: data.totalSeguidores ?? parceiroAtualizado.totalSeguidores,
+      });
 
       setUsuarios((prev) =>
         prev.map((usuario) =>
           usuario.id === usuarioId
-            ? withAvatarStyle({
-                ...usuario,
-                isFollowing,
-                totalSeguidores: data.totalSeguidores ?? usuario.totalSeguidores,
-              })
+            ? { ...parceiroConfirmado, totalSeguindo: data.totalSeguindo ?? parceiroConfirmado.totalSeguindo }
             : usuario
         )
       );
 
       setSugestoes((prev) => {
         const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
-        return isFollowing || !parceiroAtualizado ? semParceiro : [parceiroAtualizado, ...semParceiro];
+        return isFollowing ? semParceiro : [parceiroConfirmado, ...semParceiro];
       });
 
       setSeguindo((prev) => {
         const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
-        return isFollowing && parceiroAtualizado ? [parceiroAtualizado, ...semParceiro] : semParceiro;
+        return isFollowing ? [parceiroConfirmado, ...semParceiro] : semParceiro;
       });
 
       setSeguidores((prev) =>
@@ -193,14 +231,41 @@ export default function Parceiros() {
 
       setCounts((prev) => ({
         ...prev,
-        following: data.totalSeguindo ?? Math.max(0, (prev.following || 0) + (isFollowing ? 1 : -1)),
-        suggestions: Math.max(0, (prev.suggestions || 0) + (isFollowing ? -1 : 1)),
+        following: data.totalSeguindo ?? prev.following,
+        suggestions: prev.suggestions,
       }));
-
-      await carregarParceiros({ silent: true });
     } catch (error) {
       console.error("Erro ao seguir parceiro:", error);
+      setFollowError(usuarioId);
       setErro(error.message || "Erro ao seguir parceiro.");
+
+      setUsuarios((prev) =>
+        prev.map((usuario) =>
+          usuario.id === usuarioId ? parceiroAtual : usuario
+        )
+      );
+
+      setSugestoes((prev) => {
+        const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+        return parceiroAtual.isFollowing ? semParceiro : [parceiroAtual, ...semParceiro];
+      });
+
+      setSeguindo((prev) => {
+        const semParceiro = prev.filter((usuario) => usuario.id !== usuarioId);
+        return parceiroAtual.isFollowing ? [parceiroAtual, ...semParceiro] : semParceiro;
+      });
+
+      setSeguidores((prev) =>
+        prev.map((usuario) =>
+          usuario.id === usuarioId ? { ...usuario, isFollowing: parceiroAtual.isFollowing } : usuario
+        )
+      );
+
+      setCounts((prev) => ({
+        ...prev,
+        following: Math.max(0, (prev.following || 0) + (proximoEstado ? -1 : 1)),
+        suggestions: Math.max(0, (prev.suggestions || 0) + (proximoEstado ? 1 : -1)),
+      }));
     } finally {
       setFollowLoading(null);
     }
@@ -308,7 +373,7 @@ export default function Parceiros() {
                       disabled={followLoading === p.id}
                       aria-label={p.isFollowing ? `Deixar de seguir ${p.nome}` : `Seguir ${p.nome}`}
                     >
-                      {followLoading === p.id ? "..." : p.isFollowing ? "Seguindo" : "Seguir"}
+                      {followError === p.id ? "Erro" : followLoading === p.id ? "..." : p.isFollowing ? "Seguindo" : "Seguir"}
                     </button>
                   </div>
                 </li>
@@ -354,7 +419,7 @@ export default function Parceiros() {
                   disabled={followLoading === s.id}
                   aria-label={`Seguir ${s.nome}`}
                 >
-                  {followLoading === s.id ? "..." : "+ Seguir"}
+                  {followError === s.id ? "Erro" : followLoading === s.id ? "..." : "+ Seguir"}
                 </button>
               </div>
             ))}
@@ -419,7 +484,7 @@ export default function Parceiros() {
                     }}
                     disabled={followLoading === destaque.id}
                   >
-                    {destaque.isFollowing ? "Enviar mensagem" : "+ Seguir empresa"}
+                    {followError === destaque.id ? "Erro" : destaque.isFollowing ? "Enviar mensagem" : "+ Seguir empresa"}
                   </button>
                 </div>
               </div>
